@@ -26,7 +26,7 @@ name: Prepare Release (Modular)
 on:
   push:
     tags:
-      - 'v*'
+      - 'v[0-9]+.[0-9]+.[0-9]+' # Matches tags like v1.2.3
   workflow_dispatch:
     inputs:
       version:
