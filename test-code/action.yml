@@ -1,0 +1,52 @@
+# Should only be used in a job where MATLAB and MatBox is installed in previous steps
+
+name: 'Run toolbox test suites'
+description: 'Run the test suites available for a MATLAB toolbox'
+
+inputs:
+  code_directory:
+    description: 'Which folder source code is located in (needs to be added to the MATLAB path)'
+    default: './code'
+  tools_directory:
+    description: 'Where the testToolbox function is located'
+    default: './tools'
+  tests_directory:
+    description: 'Which folder the test suites are located in'
+    default: './tests'
+  report_subdirectory:
+    description: 'Subdirectory for test reports (if saving reports for multiple MATLAB releases)'
+    default: ''
+  create_badge:
+    description: 'Whether to create a badge'
+    default: 'true'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run MATLAB test suites
+      uses: matlab-actions/run-command@v2
+      if: always()
+      with:
+        command: |
+          addpath(genpath("${{ inputs.code_directory }}"));
+          addpath(genpath("${{ inputs.tools_directory }}"));
+          addpath(genpath("${{ inputs.tests_directory }}"));
+          
+          if exist("testToolbox", "file")
+            testToolbox(...
+                "ReportSubdirectory", "${{ inputs.report_subdirectory }}", ...
+                "CreateBadge", strcmp(${{ inputs.create_badge }}, 'true'));
+          else
+            matbox.tasks.testToolbox(pwd, ...
+                "SourceFolderName", "${{ inputs.code_directory }}", ...
+                "ToolsFolderName", "${{ inputs.tools_directory }}", ...
+                "ReportSubdirectory", "${{ inputs.report_subdirectory }}", ...
+                "CreateBadge", strcmp(${{ inputs.create_badge }}, 'true'));
+          end
+
+    - name: Publish test results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        check_name: ${{ inputs.report_subdirectory != '' && format('Test Results ({0})', inputs.report_subdirectory) || 'Test Results' }}
+        files: "docs/reports/**/test-results.xml"
