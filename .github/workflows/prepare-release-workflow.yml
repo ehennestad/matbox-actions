@@ -1,0 +1,89 @@
+name: Prepare toolbox release
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        required: false
+        description: 'Version number in major.minor.patch format (for manual triggers)'
+      ref_name:
+        type: string
+        required: false
+        description: 'GitHub ref name (for tag triggers)'
+      code_directory:
+        type: string
+        default: 'code'
+        description: 'Directory containing source code'
+      tools_directory:
+        type: string
+        default: 'tools'
+        description: 'Directory containing tools'
+      matlab_products:
+        description: Optional list of MATLAB products to install.
+        type: string
+        default: ''
+      matlab_versions:
+        type: string
+        default: '[]'
+        description: 'JSON array of MATLAB versions to test (optional - will be determined from MLToolboxInfo.json if not provided)'
+      python_versions:
+        type: string
+        default: ''
+        description: 'JSON object mapping MATLAB versions to Python versions'
+      needs_python:
+        type: boolean
+        default: false
+        description: 'Whether Python is needed for testing (controls if Python versions are included in test matrix)'
+    secrets:
+      DEPLOY_KEY:
+        required: true
+        description: 'SSH deploy key for pushing to protected branches'
+
+jobs:
+  validate_version:
+    name: Validate version number
+    uses: ehennestad/matbox-actions/.github/workflows/validate-version-job.yml@v1
+    with:
+      version: ${{ inputs.version }}
+      ref_name: ${{ inputs.ref_name }}
+
+  configure_test_matrix:
+    name: Configure release test matrix
+    uses: ehennestad/matbox-actions/.github/workflows/configure-matrix-job.yml@v1
+    with:
+      tools_directory: ${{ inputs.tools_directory }}
+      matlab_versions: ${{ inputs.matlab_versions }}
+      python_versions: ${{ inputs.python_versions }}
+      needs_python: ${{ inputs.needs_python }}
+
+  test:
+    name: Run MATLAB tests
+    needs: [validate_version, configure_test_matrix]
+    uses: ehennestad/matbox-actions/.github/workflows/run-test-matrix-job.yml@v1
+    with:
+      code_directory: ${{ inputs.code_directory }}
+      tools_directory: ${{ inputs.tools_directory }}
+      matlab_products: ${{ inputs.matlab_products }}
+      needs_python: ${{ inputs.needs_python }}
+      matrix_json: ${{ needs.configure_test_matrix.outputs.matrix }}
+
+  release:
+    name: Package toolbox and create draft release
+    needs: [test, validate_version]
+    uses: ehennestad/matbox-actions/.github/workflows/package-toolbox-job.yml@v1
+    with:
+      version_number: ${{ needs.validate_version.outputs.version_number }}
+      code_directory: ${{ inputs.code_directory }}
+      tools_directory: ${{ inputs.tools_directory }}
+    secrets:
+      DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+
+  verify_installation:
+    name: Verify toolbox installation
+    needs: [release, validate_version]
+    uses: ehennestad/matbox-actions/.github/workflows/verify-installation-job.yml@v1
+    with:
+      toolbox_name: ${{ needs.release.outputs.toolbox_name }}
+      tools_directory: ${{ inputs.tools_directory }}
+
