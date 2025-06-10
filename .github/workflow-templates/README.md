@@ -24,7 +24,7 @@ These templates are designed to work with repositories that follow the matbox-ac
 
 ### Getting Started
 
-1. Add these templates to the a [`workflow-templates` folder](https://docs.github.com/en/actions/sharing-automations/creating-workflow-templates-for-your-organization) in a `.github` repository in your GitHub organization
+1. [Add these templates](https://docs.github.com/en/actions/sharing-automations/creating-workflow-templates-for-your-organization) to the `workflow-templates` folder in a `.github` repository in your GitHub organization
 2. Navigate to your repository's "Actions" tab
 3. Click "New workflow"
 4. Look for these templates in the workflow template suggestions
