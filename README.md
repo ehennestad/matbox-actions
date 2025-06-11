@@ -15,6 +15,8 @@ A collection of GitHub Actions for MATLAB toolbox development, testing, and rele
   <img src="https://github.com/user-attachments/assets/737e3cf4-ff9f-4bf6-9c03-23365a230752" alt="426d194d-e478-4bb2-be2d-0f4f175e661f copy" height="500">
 </div>
 
+Is your toolbox full of code smells, bugs and other unwanted critters? Then I hope matbox-actions will come to the rescue!
+
 ## Overview
 
 matbox-actions enables automated workflows for MATLAB toolbox development by providing:
