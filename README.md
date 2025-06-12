@@ -12,7 +12,7 @@
 A collection of GitHub Actions for MATLAB toolbox development, testing, and release automation using the MatBox toolbox. These actions provide a complete CI/CD solution for MATLAB toolbox projects with automated testing, code analysis, packaging, and release management.
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/99ff243f-f5b8-404b-85e0-b0984df15896" alt="426d194d-e478-4bb2-be2d-0f4f175e661f copy" style="max-height: 500px; height: auto; width: auto;">
+  <img src="https://github.com/user-attachments/assets/99ff243f-f5b8-404b-85e0-b0984df15896" alt="chat_gpt_illustration_inspired_by_sven_nordquist" width=550px height=auto>
 
 </div>
 
