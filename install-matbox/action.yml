@@ -12,6 +12,7 @@ runs:
         uses: matlab-actions/run-command@v2
         with:
           command: |
+            addpath( "${{ github.action_path }}" )
             installMatBox( "${{ inputs.mode }}", "${{ runner.temp }}/matbox" )
       
       - name: Confirm installation of MatBox
