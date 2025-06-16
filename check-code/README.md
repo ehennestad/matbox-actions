@@ -10,7 +10,7 @@ The motivation is to provide automated code quality analysis for MATLAB toolboxe
 - uses: ehennestad/matbox-actions/check-code@v1
   with:
     # Directory containing source code to analyze (optional)
-    code_directory: './code'
+    source_directory: './code'
 
     # Directory containing codecheckToolbox function (optional)
     tools_directory: './tools'
@@ -47,7 +47,7 @@ jobs:
       - name: Check Code Quality
         uses: ehennestad/matbox-actions/check-code@v1
         with:
-          code_directory: './src'
+          source_directory: './src'
           tools_directory: './tools'
 ```
 
@@ -65,7 +65,7 @@ This example illustrates how the action can be used to perform automated code qu
 
 | Input | Description |
 |-------|-------------|
-| `code_directory` | [Optional] Directory containing source code to analyze (default: './code') |
+| `source_directory` | [Optional] Directory containing source code to analyze (default: './code') |
 | `tools_directory` | [Optional] Directory containing codecheckToolbox function (default: './tools') |
 
 ## Outputs

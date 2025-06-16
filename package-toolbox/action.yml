@@ -5,7 +5,7 @@ inputs:
   version_number:
     description: 'Version number to use for packaging'
     required: true
-  code_directory:
+  source_directory:
     description: 'Directory containing the MATLAB code to package'
     required: false
     default: 'code'
@@ -36,7 +36,7 @@ runs:
             [~, mltbxPath] = packageToolbox("specific", versionNumberStr);
           else
             [~, mltbxPath] = matbox.tasks.packageToolbox(pwd, "specific", versionNumberStr, ...
-              'SourceFolderName', "${{ inputs.code_directory }}");
+              'SourceFolderName', "${{ inputs.source_directory }}");
           end
           
           % Write the MLTBX path to a file for the next step

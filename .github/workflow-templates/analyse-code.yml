@@ -18,7 +18,7 @@ jobs:
     with:
       # Path to directory with code. Code Analysis will run on the contents of 
       # the specified folder (and subfolders)
-      code_directory: code
+      source_directory: code
       
       # Path to directory with (CI) tools. Used for finding customized MatBox 
       # tasks

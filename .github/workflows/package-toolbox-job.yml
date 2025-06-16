@@ -7,7 +7,7 @@ on:
         type: string
         required: true
         description: 'Version number for the release'
-      code_directory:
+      source_directory:
         type: string
         default: 'code'
         description: 'Directory containing source code'
@@ -59,7 +59,7 @@ jobs:
         uses: ehennestad/matbox-actions/package-toolbox@v1
         with:
           version_number: ${{ inputs.version_number }}
-          code_directory: ${{ inputs.code_directory }}
+          source_directory: ${{ inputs.source_directory }}
           tools_directory: ${{ inputs.tools_directory }}
 
       # Save the MLTBX.

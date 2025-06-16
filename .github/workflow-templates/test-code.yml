@@ -24,7 +24,7 @@ jobs:
     with:
       # Path to directory with code. Code coverage and code analysis will run 
       # on the contents of the specified folder (and subfolders)
-      code_directory: code
+      source_directory: code
       
       # Path to directory with (CI) tools or tests. Used for finding unit tests
       # and running customized MatBox tasks

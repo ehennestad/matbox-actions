@@ -3,7 +3,7 @@ name: Run tests
 on:
   workflow_call:
     inputs:
-      code_directory:
+      source_directory:
         type: string
         default: 'code'
         description: 'Directory containing source code'
@@ -56,7 +56,7 @@ jobs:
       - name: Run tests
         uses: ehennestad/matbox-actions/test-code@v1
         with:
-          code_directory: ${{ inputs.code_directory }}
+          source_directory: ${{ inputs.source_directory }}
           tools_directory: ${{ inputs.tools_directory }}
           report_subdirectory: ${{ matrix.MATLABVersion }}
           create_badge: false

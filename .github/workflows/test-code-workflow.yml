@@ -3,7 +3,7 @@ name: Run tests
 on:
   workflow_call:
     inputs:
-      code_directory:
+      source_directory:
         description: Path to the directory containing code. Code coverage and code analysis will run on the contents of this folder and its subfolders.
         type: string
         default: 'code'
@@ -56,13 +56,13 @@ jobs:
       - name: Check code and upload report
         uses: ehennestad/matbox-actions/check-code@v1
         with:
-          code_directory: ${{ inputs.code_directory }}
+          source_directory: ${{ inputs.source_directory }}
           tools_directory: ${{ inputs.tools_directory }}
       
       - name: Run tests
         uses: ehennestad/matbox-actions/test-code@v1
         with:
-          code_directory: ${{ inputs.code_directory }}
+          source_directory: ${{ inputs.source_directory }}
           tools_directory: ${{ inputs.tools_directory }}
 
       - name: Commit SVG badges if updated

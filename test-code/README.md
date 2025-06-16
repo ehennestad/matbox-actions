@@ -10,7 +10,7 @@ The motivation is to provide a standardized way to execute MATLAB toolbox tests 
 - uses: ehennestad/matbox-actions/test-code@v1
   with:
     # Source code directory to add to MATLAB path (optional)
-    code_directory: './code'
+    source_directory: './code'
 
     # Directory containing testToolbox function (optional)
     tools_directory: './tools'
@@ -59,7 +59,7 @@ jobs:
       - name: Test code
         uses: ehennestad/matbox-actions/test-code@v1
         with:
-          code_directory: './src'
+          source_directory: './src'
           tools_directory: './tools'
           tests_directory: './tests'
           report_subdirectory: ${{ matrix.MATLABVersion }}
@@ -87,7 +87,7 @@ This example illustrates how the action can be used to test a toolbox across mul
 
 | Input | Description |
 |-------|-------------|
-| `code_directory` | [Optional] Source code directory to add to MATLAB path (default: './code') |
+| `source_directory` | [Optional] Source code directory to add to MATLAB path (default: './code') |
 | `tools_directory` | [Optional] Directory containing testToolbox function (default: './tools') |
 | `tests_directory` | [Optional] Directory containing test suites (default: './tests') |
 | `report_subdirectory` | [Optional] Subdirectory for test reports - useful for matrix testing (default: '') |

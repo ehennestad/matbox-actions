@@ -11,7 +11,7 @@ on:
         type: string
         required: false
         description: 'GitHub ref name (for tag triggers)'
-      code_directory:
+      source_directory:
         type: string
         default: 'code'
         description: 'Directory containing source code'
@@ -62,7 +62,7 @@ jobs:
     needs: [validate_version, configure_test_matrix]
     uses: ehennestad/matbox-actions/.github/workflows/run-test-matrix-job.yml@v1
     with:
-      code_directory: ${{ inputs.code_directory }}
+      source_directory: ${{ inputs.source_directory }}
       tools_directory: ${{ inputs.tools_directory }}
       matlab_products: ${{ inputs.matlab_products }}
       needs_python: ${{ inputs.needs_python }}
@@ -74,7 +74,7 @@ jobs:
     uses: ehennestad/matbox-actions/.github/workflows/package-toolbox-job.yml@v1
     with:
       version_number: ${{ needs.validate_version.outputs.version_number }}
-      code_directory: ${{ inputs.code_directory }}
+      source_directory: ${{ inputs.source_directory }}
       tools_directory: ${{ inputs.tools_directory }}
     secrets:
       DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}

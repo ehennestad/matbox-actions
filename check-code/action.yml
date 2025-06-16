@@ -4,7 +4,7 @@ name: 'Check code and upload report'
 description: 'Analyse code for code issues and upload code issues report to GitHub'
 
 inputs:
-  code_directory:
+  source_directory:
     description: 'Which folder to run the code check on'
     required: false
     default: './code'
@@ -26,7 +26,7 @@ runs:
             codecheckToolbox();
           else
             matbox.tasks.codecheckToolbox(pwd, ...
-              "FoldersToCheck", "${{ inputs.code_directory }}");
+              "FoldersToCheck", "${{ inputs.source_directory }}");
           end
 
     - name: Upload SARIF file

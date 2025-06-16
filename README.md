@@ -170,7 +170,7 @@ jobs:
   release:
     uses: ehennestad/matbox-actions/.github/workflows/prepare-release-workflow.yml@v1
     with:
-      code_directory: code
+      source_directory: code
       tools_directory: tools
     secrets:
       DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}

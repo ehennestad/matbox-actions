@@ -4,7 +4,7 @@ name: 'Run toolbox test suites'
 description: 'Run the test suites available for a MATLAB toolbox'
 
 inputs:
-  code_directory:
+  source_directory:
     description: 'Which folder source code is located in (needs to be added to the MATLAB path)'
     default: './code'
   tools_directory:
@@ -28,7 +28,7 @@ runs:
       if: always()
       with:
         command: |
-          addpath(genpath("${{ inputs.code_directory }}"));
+          addpath(genpath("${{ inputs.source_directory }}"));
           addpath(genpath("${{ inputs.tools_directory }}"));
           addpath(genpath("${{ inputs.tests_directory }}"));
           
@@ -38,7 +38,7 @@ runs:
                 "CreateBadge", strcmp(${{ inputs.create_badge }}, 'true'));
           else
             matbox.tasks.testToolbox(pwd, ...
-                "SourceFolderName", "${{ inputs.code_directory }}", ...
+                "SourceFolderName", "${{ inputs.source_directory }}", ...
                 "ToolsFolderName", "${{ inputs.tools_directory }}", ...
                 "ReportSubdirectory", "${{ inputs.report_subdirectory }}", ...
                 "CreateBadge", strcmp(${{ inputs.create_badge }}, 'true'));
