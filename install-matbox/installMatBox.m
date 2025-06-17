@@ -55,7 +55,7 @@ function installFromCommit(installationFolder)
     if isfolder(targetFolder); rmdir(targetFolder, "s"); end
     movefile(unzippedFolder, targetFolder);
 
-    % Add to MATLAB's search path
-    addpath(genpath(targetFolder))
+    % Add to MATLAB's search path. Important: Only add code folder
+    addpath(genpath(fullfile(targetFolder, 'code')))
     savepath()
 end
