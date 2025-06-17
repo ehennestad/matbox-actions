@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  reuse-workflow-run-codespell:
+  run-codespell:
     name: Run Codespell
     uses: ehennestad/matbox-actions/.github/workflows/codespell-workflow.yml@v1
     with:
