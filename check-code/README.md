@@ -10,7 +10,7 @@ The motivation is to provide automated code quality analysis for MATLAB toolboxe
 - uses: ehennestad/matbox-actions/check-code@v1
   with:
     # Directory containing source code to analyze (optional)
-    source_directory: './code'
+    source_directory: './src'
 
     # Directory containing codecheckToolbox function (optional)
     tools_directory: './tools'

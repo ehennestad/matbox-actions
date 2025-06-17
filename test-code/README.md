@@ -10,7 +10,7 @@ The motivation is to provide a standardized way to execute MATLAB toolbox tests 
 - uses: ehennestad/matbox-actions/test-code@v1
   with:
     # Source code directory to add to MATLAB path (optional)
-    source_directory: './code'
+    source_directory: './src'
 
     # Directory containing testToolbox function (optional)
     tools_directory: './tools'

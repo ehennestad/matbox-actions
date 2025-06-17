@@ -24,7 +24,7 @@ jobs:
     with:
       # Path to directory with code. Code coverage and code analysis will run 
       # on the contents of the specified folder (and subfolders)
-      source_directory: code
+      source_directory: src
       
       # Path to directory containing tests. This directory will be used for 
       # locating MATLAB  test suites

@@ -158,7 +158,7 @@ jobs:
       - name: Run tests
         uses: ehennestad/matbox-actions/test-code@v1
         with:
-          source_directory: code
+          source_directory: src
           tools_directory: tools
 
   release:

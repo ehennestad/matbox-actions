@@ -24,7 +24,7 @@ jobs:
       
       # Path to directory containing source code. This directory will be packaged
       # into the toolbox. Important: This should not be a namespace directory
-      source_directory: code
+      source_directory: src
       
       # Path to directory containing tests. This directory will be used for 
       # locating MATLAB  test suites
