@@ -13,7 +13,7 @@ on:
         description: 'GitHub ref name (for tag triggers)'
       source_directory:
         type: string
-        default: 'code'
+        default: 'src'
         description: 'Directory containing source code'
       tests_directory:
         type: string

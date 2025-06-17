@@ -76,7 +76,7 @@ Configures test matrices for MATLAB and Python versions.
 Runs MATLAB tests across multiple versions.
 
 **Inputs:**
-- `source_directory` (default: 'code'): Source code directory
+- `source_directory` (default: 'src'): Source code directory
 - `tools_directory` (default: 'tools'): Tools directory
 - `matlab_products` (default: ''): MATLAB products to install
 - `needs_python` (default: false): Whether Python is needed
@@ -88,7 +88,7 @@ Packages the toolbox and creates a GitHub draft release.
 
 **Inputs:**
 - `version_number` (required): Version number for the release
-- `source_directory` (default: 'code'): Source code directory
+- `source_directory` (default: 'src'): Source code directory
 - `tools_directory` (default: 'tools'): Tools directory
 
 **Secrets:**

@@ -9,7 +9,7 @@ on:
         description: 'Version number for the release'
       source_directory:
         type: string
-        default: 'code'
+        default: 'src'
         description: 'Directory containing source code'
       tools_directory:
         type: string

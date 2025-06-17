@@ -6,7 +6,7 @@ on:
       source_directory:
         description: Path to the directory containing code. Code analysis will run on the contents of this folder and its subfolders.
         type: string
-        default: 'code'
+        default: 'src'
       tools_directory:
         description: Path to the directory containing CI tools. Used for locating customized MatBox tasks.
         type: string

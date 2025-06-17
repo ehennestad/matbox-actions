@@ -5,7 +5,7 @@ on:
     inputs:
       source_directory:
         type: string
-        default: 'code'
+        default: 'src'
         description: 'Directory containing source code'
       tests_directory:
         type: string

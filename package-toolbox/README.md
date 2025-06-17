@@ -13,7 +13,7 @@ The motivation is to provide automated toolbox packaging for MATLAB toolboxes wi
     version_number: ${{ steps.validate.outputs.version_number }}
 
     # Directory containing MATLAB code to package (optional)
-    source_directory: 'code'
+    source_directory: 'src'
 
     # Directory containing packaging tools and MLToolboxInfo.json (optional)
     tools_directory: 'tools'
@@ -81,7 +81,7 @@ This example illustrates how the action can be used to package a toolbox for rel
 | Input | Description |
 |-------|-------------|
 | `version_number` | [Required] Version number to use for packaging (without 'v' prefix) |
-| `source_directory` | [Optional] Directory containing MATLAB code to package (default: 'code') |
+| `source_directory` | [Optional] Directory containing MATLAB code to package (default: 'src') |
 | `tools_directory` | [Optional] Directory containing packaging tools and MLToolboxInfo.json (default: 'tools') |
 
 ## Outputs

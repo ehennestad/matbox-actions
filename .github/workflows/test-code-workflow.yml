@@ -6,7 +6,7 @@ on:
       source_directory:
         description: Path to the directory containing code. Code coverage and code analysis will run on the contents of this folder and its subfolders.
         type: string
-        default: 'code'
+        default: 'src'
       tests_directory:
         type: string
         default: 'tests'

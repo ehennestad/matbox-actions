@@ -8,7 +8,7 @@ inputs:
   source_directory:
     description: 'Directory containing the MATLAB code to package'
     required: false
-    default: 'code'
+    default: 'src'
   tools_directory:
     description: 'Directory containing packaging tools'
     required: false
