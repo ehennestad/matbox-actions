@@ -26,6 +26,10 @@ jobs:
       # on the contents of the specified folder (and subfolders)
       source_directory: code
       
+      # Path to directory containing tests. This directory will be used for 
+      # locating MATLAB  test suites
+      tests_directory: tests
+      
       # Path to directory with (CI) tools or tests. Used for finding unit tests
       # and running customized MatBox tasks
       tools_directory: tools

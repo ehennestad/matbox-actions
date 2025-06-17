@@ -9,18 +9,23 @@ name: Prepare toolbox release (modular)
 #    - Find: source_directory: src
 #    - Replace with your source directory, e.g.: source_directory: src
 #
-# 2. TOOLS_DIRECTORY (default: 'tools') 
+# 2. TESTS_DIRECTORY (default: 'tests')
+#    - Directory containing your MATLAB test suites (relative to repository root)
+#    - Find: tests_directory: tests
+#    - Replace with your tests directory, e.g.: tests_directory: unittests
+#
+# 3. TOOLS_DIRECTORY (default: 'tools') 
 #    - Directory containing tools and MLToolboxInfo.json (relative to repository root)
 #    - Find: tools_directory: tools
 #    - Replace with your tools directory, e.g.: tools_directory: build
 #
-# 3. NEEDS_PYTHON (default: false)
+# 4. NEEDS_PYTHON (default: false)
 #    - Set to true if your toolbox requires Python for testing
 #    - This includes Python versions in test matrix and sets up Python environments
 #    - Find: needs_python: false
 #    - Replace with: needs_python: true (if Python is required)
 #
-# 4. MATLAB_PRODUCTS (default: '')
+# 5. MATLAB_PRODUCTS (default: '')
 #    - Optional MATLAB products to install during testing (space-separated list)
 #    - Find: matlab_products: ''
 #    - Replace with products, e.g.: matlab_products: 'Simulink Signal_Processing_Toolbox'
@@ -57,6 +62,7 @@ jobs:
     uses: ehennestad/matbox-actions/.github/workflows/run-test-matrix-job.yml@v1
     with:
       source_directory: src
+      tests_directory: tests
       tools_directory: tools
       matlab_products: ''
       needs_python: false

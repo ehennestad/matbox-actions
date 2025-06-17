@@ -7,6 +7,10 @@ on:
         type: string
         default: 'code'
         description: 'Directory containing source code'
+      tests_directory:
+        type: string
+        default: 'tests'
+        description: 'Directory containing MATLAB test suites'
       tools_directory:
         type: string
         default: 'tools'
@@ -57,6 +61,7 @@ jobs:
         uses: ehennestad/matbox-actions/test-code@v1
         with:
           source_directory: ${{ inputs.source_directory }}
+          tests_directory: ${{ inputs.tests_directory }}
           tools_directory: ${{ inputs.tools_directory }}
           report_subdirectory: ${{ matrix.MATLABVersion }}
           create_badge: false

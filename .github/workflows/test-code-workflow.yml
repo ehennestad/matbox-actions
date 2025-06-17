@@ -7,6 +7,10 @@ on:
         description: Path to the directory containing code. Code coverage and code analysis will run on the contents of this folder and its subfolders.
         type: string
         default: 'code'
+      tests_directory:
+        type: string
+        default: 'tests'
+        description: 'Directory containing MATLAB test suites'
       tools_directory:
         description: Path to the directory containing CI tools or tests. Used for locating unit tests and running customized MatBox tasks.
         type: string
@@ -63,6 +67,7 @@ jobs:
         uses: ehennestad/matbox-actions/test-code@v1
         with:
           source_directory: ${{ inputs.source_directory }}
+          tests_directory: ${{ inputs.tests_directory }}
           tools_directory: ${{ inputs.tools_directory }}
 
       - name: Commit SVG badges if updated

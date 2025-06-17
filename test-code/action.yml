@@ -7,12 +7,12 @@ inputs:
   source_directory:
     description: 'Which folder source code is located in (needs to be added to the MATLAB path)'
     default: './code'
-  tools_directory:
-    description: 'Where the testToolbox function is located'
-    default: './tools'
   tests_directory:
     description: 'Which folder the test suites are located in'
     default: './tests'
+  tools_directory:
+    description: 'Where the testToolbox function is located'
+    default: './tools'
   report_subdirectory:
     description: 'Subdirectory for test reports (if saving reports for multiple MATLAB releases)'
     default: ''
@@ -39,6 +39,7 @@ runs:
           else
             matbox.tasks.testToolbox(pwd, ...
                 "SourceFolderName", "${{ inputs.source_directory }}", ...
+                "TestsFolderName", "${{ inputs.tests_directory }}", ...
                 "ToolsFolderName", "${{ inputs.tools_directory }}", ...
                 "ReportSubdirectory", "${{ inputs.report_subdirectory }}", ...
                 "CreateBadge", strcmp(${{ inputs.create_badge }}, 'true'));

@@ -15,6 +15,10 @@ on:
         type: string
         default: 'code'
         description: 'Directory containing source code'
+      tests_directory:
+        type: string
+        default: 'tests'
+        description: 'Directory containing MATLAB test suites'
       tools_directory:
         type: string
         default: 'tools'
@@ -63,6 +67,7 @@ jobs:
     uses: ehennestad/matbox-actions/.github/workflows/run-test-matrix-job.yml@v1
     with:
       source_directory: ${{ inputs.source_directory }}
+      tests_directory: ${{ inputs.tests_directory }}
       tools_directory: ${{ inputs.tools_directory }}
       matlab_products: ${{ inputs.matlab_products }}
       needs_python: ${{ inputs.needs_python }}
