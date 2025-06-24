@@ -51,7 +51,7 @@ jobs:
 
   configure_test_matrix:
     name: Configure release test matrix
-    uses: ehennestad/matbox-actions/.github/workflows/configure-matrix-job.yml@v1
+    uses: ehennestad/matbox-actions/.github/workflows/create-matrix-job.yml@v1
     with:
       tools_directory: tools
       needs_python: false

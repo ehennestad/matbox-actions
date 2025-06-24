@@ -57,9 +57,9 @@ Validates version numbers.
 **Outputs:**
 - `version_number`: Validated version number
 
-### `configure-matrix-job.yml`
+### `create-matrix-job.yml`
 
-Configures test matrices for MATLAB and Python versions.
+Creates test matrices for MATLAB and Python versions.
 
 **Inputs:**
 - `tools_directory` (default: 'tools'): Directory containing tools
@@ -128,7 +128,7 @@ jobs:
       ref_name: ${{ github.ref_name }}
 
   configure_test_matrix:
-    uses: ./.github/workflows/configure-matrix-job.yml
+    uses: ./.github/workflows/create-matrix-job.yml.yml
     with:
       needs_python: true
 
