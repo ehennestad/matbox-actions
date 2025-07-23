@@ -42,8 +42,8 @@ runs:
           % Write the MLTBX path to a file for the next step
           matbox.utility.filewrite('mltbx_path.txt', mltbxPath);
           
-    - name: Set version number
-      id: set_version
+    - name: Assign action utputs
+      id: assign_action_output
       shell: bash
       run: |
         toolboxName=$(jq -r '.ToolboxOptions.ToolboxName' "${{ inputs.tools_directory }}/MLToolboxInfo.json")
