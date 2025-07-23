@@ -25,7 +25,7 @@ runs:
       with:
         pattern: reports-*
         path: docs/reports
-        merge-multiple: true
+        merge-multiple: false
         
     - name: Generate "tested with" badge
       uses: matlab-actions/run-command@v2
