@@ -17,10 +17,10 @@ inputs:
 outputs:
   mltbx_path:
     description: 'Path to the packaged MLTBX file'
-    value: ${{ steps.set_version.outputs.mltbx_path }}
+    value: ${{ steps.assign_action_output.outputs.mltbx_path }}
   toolbox_name:
     description: 'Name of the toolbox from MLToolboxInfo.json'
-    value: ${{ steps.set_version.outputs.toolbox_name }}
+    value: ${{ steps.assign_action_output.outputs.toolbox_name }}
 
 runs:
   using: "composite"
