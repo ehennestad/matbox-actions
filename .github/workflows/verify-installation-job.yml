@@ -41,7 +41,7 @@ jobs:
         uses: matlab-actions/run-command@v2
         with:
           command: |
-            listing = fullfile(pwd, '${{ inputs.toolbox_name }}*.mltbx');
+            listing = dir(fullfile(pwd, '${{ inputs.toolbox_name }}*.mltbx'));
             toolboxFile = fullfile(listing.folder, listing.name);
 
             addpath(genpath("${{ inputs.tools_directory }}"));
