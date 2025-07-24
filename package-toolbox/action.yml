@@ -28,6 +28,8 @@ runs:
     - name: Package toolbox
       id: package
       uses: matlab-actions/run-command@v2
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
       with:
         command: |
           addpath(genpath("${{ inputs.tools_directory }}"));
@@ -42,7 +44,7 @@ runs:
           % Write the MLTBX path to a file for the next step
           matbox.utility.filewrite('mltbx_path.txt', mltbxPath);
           
-    - name: Assign action utputs
+    - name: Assign action outputs
       id: assign_action_output
       shell: bash
       run: |
