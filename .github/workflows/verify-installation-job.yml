@@ -41,6 +41,7 @@ jobs:
         uses: matlab-actions/run-command@v2
         with:
           command: |
+            pwd
             addpath(genpath("${{ inputs.tools_directory }}"));
             toolboxFile = "${{ inputs.toolbox_name }}.mltbx"
             if exist("verifyToolboxInstallation", "file")
