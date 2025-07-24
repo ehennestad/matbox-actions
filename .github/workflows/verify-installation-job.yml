@@ -36,6 +36,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.toolbox_name }}.mltbx
+          path: ${{ inputs.toolbox_name }}.mltbx
 
       - name: Install and verify toolbox
         uses: matlab-actions/run-command@v2
