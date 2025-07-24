@@ -46,6 +46,8 @@ jobs:
             ls
             addpath(genpath("${{ inputs.tools_directory }}"));
             toolboxFile = "${{ inputs.toolbox_name }}.mltbx"
+            toolboxFile = fullfile(pwd, toolboxFile)
+            fprintf('Toolbox file exists: %d\n', isfile(toolboxFile))
             if exist("verifyToolboxInstallation", "file")
               verifyToolboxInstallation(toolboxFile);
             else
