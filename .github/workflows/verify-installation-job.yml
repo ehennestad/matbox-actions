@@ -36,17 +36,15 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.toolbox_name }}.mltbx
-          path: ${{ inputs.toolbox_name }}.mltbx
 
       - name: Install and verify toolbox
         uses: matlab-actions/run-command@v2
         with:
           command: |
-            pwd
-            ls
+            listing = fullfile(pwd, ${{ inputs.toolbox_name }}*.mltbx');
+            toolboxFile = fullfile(listing.folder, listing.name);
+
             addpath(genpath("${{ inputs.tools_directory }}"));
-            toolboxFile = "${{ inputs.toolbox_name }}.mltbx"
-            toolboxFile = fullfile(pwd, toolboxFile)
             fprintf('Toolbox file exists: %d\n', isfile(toolboxFile))
             if exist("verifyToolboxInstallation", "file")
               verifyToolboxInstallation(toolboxFile);
