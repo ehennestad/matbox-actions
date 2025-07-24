@@ -42,6 +42,7 @@ jobs:
         with:
           command: |
             pwd
+            ls
             addpath(genpath("${{ inputs.tools_directory }}"));
             toolboxFile = "${{ inputs.toolbox_name }}.mltbx"
             if exist("verifyToolboxInstallation", "file")
