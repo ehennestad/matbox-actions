@@ -63,7 +63,6 @@ jobs:
           source_directory: ${{ inputs.source_directory }}
           tests_directory: ${{ inputs.tests_directory }}
           tools_directory: ${{ inputs.tools_directory }}
-          report_subdirectory: ${{ matrix.MATLABVersion }}
           create_badge: false
 
       # Save the contents of the report directory from each release into an artifact.
@@ -71,5 +70,8 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
+          # Specify MATLAB release in artifact name. This is used in a 
+          # subsequent job to create a summary badge for the GitHub release page
+          # using results across multiple MATLAB releases.
           name: reports-${{ matrix.MATLABVersion }}
           path: docs/reports

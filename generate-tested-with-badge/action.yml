@@ -26,7 +26,12 @@ runs:
         pattern: reports-*
         path: docs/reports
         merge-multiple: false
-        
+      # We are downloading all test reports from a matrix test across multiple 
+      # MATLAB releases. The artifacts should be named like "reports-R2022a"
+      # so we are retrieving reports across the different MATLAB releases that
+      # were tested across. Use "merge-multiple: false" to download each 
+      # test-report into a subfolder using the artifact names as subfolder name
+    
     - name: Generate "tested with" badge
       uses: matlab-actions/run-command@v2
       with:
