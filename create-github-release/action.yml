@@ -8,6 +8,10 @@ inputs:
   mltbx_path:
     description: 'Path to the MLTBX file'
     required: true
+  source_directory:
+    description: 'Directory containing source code'
+    required: false
+    default: 'src'
 
 runs:
   using: "composite"
@@ -20,6 +24,7 @@ runs:
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git status
         git add code/Contents.m
+        find ${{ inputs.source_directory }} -type f -name Contents.m -exec git add {} +
         git commit -m "Final check-ins for release v${{ inputs.version_number }} [skip-ci]"
         git fetch
         git push
