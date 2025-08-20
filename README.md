@@ -142,7 +142,7 @@ See the [workflow templates README](./.github/workflow-templates/README.md) for 
 
 - **MATLAB**: Actions require MATLAB to be installed (use [`matlab-actions/setup-matlab`](https://github.com/matlab-actions/setup-matlab))
 - **MatBox toolbox**: Automatically installed by the `install-matbox` action
-- **Repository Structure**: Follow the recommended directory layout with `code/` and `tools/` directories
+- **Repository Structure**: Follow the recommended directory layout with `src/`, `tests/` and `tools/` directories
 - **Metadata**: `MLToolboxInfo.json` file required for packaging and release workflows
 
 ## Advanced Usage

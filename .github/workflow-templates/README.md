@@ -19,8 +19,9 @@ This directory contains GitHub workflow templates for MATLAB toolbox development
 
 These templates are designed to work with repositories that follow the matbox-actions conventions:
 
-- **Code directory**: Contains the main MATLAB source code
-- **Tools directory**: Contains unit tests, CI tools, and `MLToolboxInfo.json` metadata file
+- **Source code directory**: Contains the main MATLAB source code. Default: `src`.
+- **Tests directory**: Contains unit tests, test helpers, etc. Default: `tests`.
+- **Tools directory**: Contains CI tools, and `MLToolboxInfo.json` metadata file. Default: `tools`.
 
 ### Getting Started
 
@@ -35,7 +36,7 @@ These templates are designed to work with repositories that follow the matbox-ac
 
 Each template includes configurable parameters such as:
 
-- Directory paths for code and tools
+- Directory paths for source, tests and tools folders
 - MATLAB release versions
 - Additional MATLAB products to install
 - Python version requirements (for toolboxes with Python dependencies)
@@ -45,7 +46,7 @@ Each template includes configurable parameters such as:
 
 - Repository must be set up for MATLAB toolbox development
 - For release workflows: `DEPLOY_KEY` secret must be configured for protected branch access
-- Proper directory structure with code and tools folders
+- Recommended directory structure with `src`, `tests` and `tools` folders
 
 ## Related Actions
 

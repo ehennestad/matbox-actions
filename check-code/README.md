@@ -65,7 +65,7 @@ This example illustrates how the action can be used to perform automated code qu
 
 | Input | Description |
 |-------|-------------|
-| `source_directory` | [Optional] Directory containing source code to analyze (default: './code') |
+| `source_directory` | [Optional] Directory containing source code to analyze (default: './src') |
 | `tools_directory` | [Optional] Directory containing codecheckToolbox function (default: './tools') |
 
 ## Outputs

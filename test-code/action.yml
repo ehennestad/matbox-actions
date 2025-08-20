@@ -6,7 +6,7 @@ description: 'Run the test suites available for a MATLAB toolbox'
 inputs:
   source_directory:
     description: 'Which folder source code is located in (needs to be added to the MATLAB path)'
-    default: './code'
+    default: './src'
   tests_directory:
     description: 'Which folder the test suites are located in'
     default: './tests'

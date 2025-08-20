@@ -87,7 +87,7 @@ This example illustrates how the action can be used to test a toolbox across mul
 
 | Input | Description |
 |-------|-------------|
-| `source_directory` | [Optional] Source code directory to add to MATLAB path (default: './code') |
+| `source_directory` | [Optional] Source code directory to add to MATLAB path (default: './src') |
 | `tools_directory` | [Optional] Directory containing testToolbox function (default: './tools') |
 | `tests_directory` | [Optional] Directory containing test suites (default: './tests') |
 | `report_subdirectory` | [Optional] Subdirectory for test reports - useful for matrix testing (default: '') |
