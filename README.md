@@ -40,10 +40,11 @@ Organize your MATLAB toolbox repository with the following structure:
 
 ```
 your-toolbox/
-├── code/                    # Main MATLAB source code
-├── tools/                   # CI tools and metadata
+├── src/                    # Main MATLAB source code
+├── tests/                  # Unittests and test helpers
+├── tools/                  # CI tools and metadata
 │   ├── MLToolboxInfo.json  # Toolbox metadata
-│   └── tests/              # Unit tests (optional)
+│   └── tasks/              # Custom/extended MatBox task functions (optional)
 └── .github/
     └── workflows/          # GitHub workflow files
 ```
