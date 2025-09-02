@@ -20,17 +20,27 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Check for [skip actions] in commit message
+    - name: Check for [skip actions] in tag annotation
       id: check_skip_actions
       shell: bash
       run: |
-        if [[ "${{ contains(github.event.head_commit.message, '[skip actions]') }}" == "true" ]]; then
-          echo "::notice:: Commit message contains [skip actions], skipping workflow."
-          echo "skip_workflow=true" >> $GITHUB_OUTPUT
-          exit 0
-        else
-          echo "skip_workflow=false" >> $GITHUB_OUTPUT
+        # If triggered by a tag, check the tag annotation message
+        if [[ -n "${{ inputs.ref_name }}" ]]; then
+          TAG_NAME="${{ inputs.ref_name }}"
+          echo "Checking tag annotation for: $TAG_NAME"
+          
+          # Get the tag annotation message
+          TAG_MESSAGE=$(git tag -l --format='%(contents)' "$TAG_NAME" 2>/dev/null || echo "")
+          echo "Tag message: '$TAG_MESSAGE'"
+          
+          if [[ "$TAG_MESSAGE" == *"[skip actions]"* ]]; then
+            echo "::notice:: Tag annotation contains [skip actions], skipping workflow."
+            echo "skip_workflow=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
         fi
+        
+        echo "skip_workflow=false" >> $GITHUB_OUTPUT
         
     - name: Set version based on trigger type
       id: set_version
