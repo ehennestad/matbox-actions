@@ -13,19 +13,28 @@ outputs:
   version_number:
     description: 'Validated version number (without v prefix)'
     value: ${{ steps.set_version.outputs.version_number }}
+  skip_workflow:
+    description: 'Whether to skip the workflow (true if [skip actions] found)'
+    value: ${{ steps.check_skip_actions.outputs.skip_workflow }}
 
 runs:
   using: "composite"
   steps:
     - name: Check for [skip actions] in commit message
-      if: ${{ contains(github.event.head_commit.message, '[skip actions]') }}
+      id: check_skip_actions
       shell: bash
       run: |
-        echo "::notice:: Commit message contains [skip actions], skipping."
-        exit 1
+        if [[ "${{ contains(github.event.head_commit.message, '[skip actions]') }}" == "true" ]]; then
+          echo "::notice:: Commit message contains [skip actions], skipping workflow."
+          echo "skip_workflow=true" >> $GITHUB_OUTPUT
+          exit 0
+        else
+          echo "skip_workflow=false" >> $GITHUB_OUTPUT
+        fi
         
     - name: Set version based on trigger type
       id: set_version
+      if: steps.check_skip_actions.outputs.skip_workflow != 'true'
       shell: bash
       run: |
         if [[ -n "${{ inputs.version }}" ]]; then

@@ -54,6 +54,8 @@ jobs:
 
   configure_test_matrix:
     name: Configure release test matrix
+    needs: validate_version
+    if: needs.validate_version.outputs.skip_workflow != 'true'
     uses: ehennestad/matbox-actions/.github/workflows/create-matrix-job.yml@v1
     with:
       tools_directory: ${{ inputs.tools_directory }}
@@ -64,6 +66,7 @@ jobs:
   test:
     name: Run MATLAB tests
     needs: [validate_version, configure_test_matrix]
+    if: needs.validate_version.outputs.skip_workflow != 'true'
     uses: ehennestad/matbox-actions/.github/workflows/run-test-matrix-job.yml@v1
     with:
       source_directory: ${{ inputs.source_directory }}
@@ -76,6 +79,7 @@ jobs:
   release:
     name: Package toolbox and create draft release
     needs: [test, validate_version]
+    if: needs.validate_version.outputs.skip_workflow != 'true'
     uses: ehennestad/matbox-actions/.github/workflows/package-toolbox-job.yml@v1
     with:
       version_number: ${{ needs.validate_version.outputs.version_number }}
@@ -87,8 +91,8 @@ jobs:
   verify_installation:
     name: Verify toolbox installation
     needs: [release, validate_version]
+    if: needs.validate_version.outputs.skip_workflow != 'true'
     uses: ehennestad/matbox-actions/.github/workflows/verify-installation-job.yml@v1
     with:
       toolbox_name: ${{ needs.release.outputs.toolbox_name }}
       tools_directory: ${{ inputs.tools_directory }}
-
