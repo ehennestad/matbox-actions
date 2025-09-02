@@ -24,7 +24,7 @@ runs:
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git status
         find ${{ inputs.source_directory }} -type f -name Contents.m -exec git add {} +
-        git commit -m "Final check-ins for release v${{ inputs.version_number }} [skip-ci]"
+        git commit -m "Final check-ins for release v${{ inputs.version_number }} [skip actions]"
         git fetch
         git push
         
@@ -52,8 +52,8 @@ runs:
           echo "Remote tag v${{ inputs.version_number }} does not exist"
         fi
       
-        # Create the tag with a message, including [skip ci] to prevent CI workflows
-        git tag -a "v${{ inputs.version_number }}" -m "Release v${{ inputs.version_number }} [skip ci]" 
+        # Create the tag with a message, including [skip actions] to prevent CI workflows
+        git tag -a "v${{ inputs.version_number }}" -m "Release v${{ inputs.version_number }} [skip actions]" 
       
         # Push the new tag to the remote repository
         git push origin "v${{ inputs.version_number }}"

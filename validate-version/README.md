@@ -58,7 +58,7 @@ This example illustrates how the action can be used to provide a clean version n
 - Validates semantic versioning format (`x.y.z`)
 - Handles both manual input and Git tag scenarios
 - Strips 'v' prefix from tags automatically
-- Skips execution if commit contains `[skip-ci]`
+- Skips execution if commit contains `[skip actions]`
 - Provides clean version number output
 
 ## Inputs
@@ -77,4 +77,4 @@ This example illustrates how the action can be used to provide a clean version n
 
 ## Skip CI Feature
 
-The action will automatically fail if the commit message contains `[skip-ci]`, effectively skipping release processing when needed (e.g. when re-tagging due to minor updates such as bumping a version number).
+The action will automatically fail if the commit message contains `[skip actions]`, effectively skipping release processing when needed (e.g. when re-tagging due to minor updates such as bumping a version number).

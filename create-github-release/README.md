@@ -69,7 +69,7 @@ This example illustrates how the action can be used to create a complete release
 - Creates draft GitHub releases with packaged MLTBX files
 - Automatically generates release notes
 - Includes "tested with" badges from `gh-badges` branch
-- Uses [skip-ci] markers to prevent recursive workflow triggers
+- Uses [skip actions] markers to prevent recursive workflow triggers
 
 ## Inputs
 
@@ -85,7 +85,7 @@ This action does not produce direct outputs, but creates a draft GitHub release 
 ## Release Process
 
 The action follows this process:
-1. **Commit Changes**: Commits any updated Contents.m files with [skip-ci] marker
+1. **Commit Changes**: Commits any updated Contents.m files with [skip actions] marker
 2. **Tag Management**: Deletes existing tags (local and remote) and creates new ones
 3. **Release Creation**: Creates a draft GitHub release with automatic release notes
 4. **Badge Integration**: Includes "tested with" badges linking to `gh-badges` branch
