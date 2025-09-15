@@ -35,7 +35,8 @@ runs:
           addpath(genpath("${{ inputs.tools_directory }}"));
           versionNumberStr = "v${{ inputs.version_number }}";
           if exist("packageToolbox", "file")
-            [~, mltbxPath] = packageToolbox("specific", versionNumberStr);
+            [~, mltbxPath] = packageToolbox("specific", versionNumberStr, ...
+              'SourceFolderName', "${{ inputs.source_directory }}");
           else
             [~, mltbxPath] = matbox.tasks.packageToolbox(pwd, "specific", versionNumberStr, ...
               'SourceFolderName', "${{ inputs.source_directory }}");
