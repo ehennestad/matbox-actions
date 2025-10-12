@@ -53,6 +53,8 @@ jobs:
           version_number: ${{ inputs.version_number }}
           tools_directory: ${{ inputs.tools_directory }}
 
+      # Todo: Update version number in source code could be its own step
+
       # Package toolbox
       - name: Package toolbox
         id: package
@@ -76,3 +78,4 @@ jobs:
         with:
           version_number: ${{ inputs.version_number }}
           mltbx_path: ${{ steps.package.outputs.mltbx_path }}
+          source_directory: ${{ inputs.source_directory }}
