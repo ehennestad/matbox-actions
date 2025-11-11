@@ -27,6 +27,10 @@ on:
         description: Optional list of MATLAB products to install.
         type: string
         default: ''
+      install_virtual_display:
+        description: Whether to install virtual display for testing.
+        type: boolean
+        default: false
 
     secrets:
       CODECOV_TOKEN:
@@ -46,6 +50,14 @@ jobs:
       
       - name: Check out repository
         uses: actions/checkout@v4
+
+      # Install the virtual display before installing MATLAB
+      - name: Start virtual display server
+        if: ${{ inputs.install_virtual_display }}
+        run: |
+          sudo apt-get install -y xvfb
+          Xvfb :99 &
+          echo "DISPLAY=:99" >> $GITHUB_ENV
 
       - name: Set up MATLAB (${{ inputs.matlab_release }})
         uses: matlab-actions/setup-matlab@v2
