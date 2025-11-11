@@ -42,6 +42,9 @@ jobs:
       
       # Whether to cache the MATLAB installation for faster subsequent setups
       matlab_use_cache: false
+
+      # Whether to install virtual display for testing.
+      install_virtual_display: false
       
       # Optional list of MATLAB products to install. Example if adding multiple 
       # products (use ">" and one product per line):
