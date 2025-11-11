@@ -27,7 +27,7 @@ on:
         description: Optional list of MATLAB products to install.
         type: string
         default: ''
-      install_virtual_display:
+      needs_virtual_display:
         description: Whether to install virtual display for testing.
         type: boolean
         default: false
@@ -53,7 +53,7 @@ jobs:
 
       # Install the virtual display before installing MATLAB
       - name: Start virtual display server
-        if: ${{ inputs.install_virtual_display }}
+        if: ${{ inputs.needs_virtual_display }}
         run: |
           sudo apt-get install -y xvfb
           Xvfb :99 &

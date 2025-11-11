@@ -39,6 +39,11 @@ on:
         type: boolean
         default: false
         description: 'Whether Python is needed for testing (controls if Python versions are included in test matrix)'
+      needs_virtual_display:
+        type: boolean
+        default: false
+        description: Whether to install virtual display for testing.
+    
     secrets:
       DEPLOY_KEY:
         required: true
@@ -74,6 +79,7 @@ jobs:
       matlab_products: ${{ inputs.matlab_products }}
       needs_python: ${{ inputs.needs_python }}
       matrix_json: ${{ needs.configure_test_matrix.outputs.matrix }}
+      needs_virtual_display: ${{ inputs.needs_virtual_display }}
 
   release:
     name: Package toolbox and create draft release

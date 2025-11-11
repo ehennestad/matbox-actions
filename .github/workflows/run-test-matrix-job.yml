@@ -27,7 +27,11 @@ on:
         type: string
         required: true
         description: 'JSON string containing the test matrix from build-matrix job'
-
+      needs_virtual_display:
+        type: boolean
+        default: false
+        description: Whether to install virtual display for testing.
+    
 jobs:
   test:
     name: Run MATLAB tests (${{ matrix.MATLABVersion }})
@@ -46,6 +50,14 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.pythonVersion }}
+
+      # Install the virtual display before installing MATLAB
+      - name: Start virtual display server
+        if: ${{ inputs.needs_virtual_display }}
+        run: |
+          sudo apt-get install -y xvfb
+          Xvfb :99 &
+          echo "DISPLAY=:99" >> $GITHUB_ENV
 
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v2
