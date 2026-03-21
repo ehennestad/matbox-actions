@@ -1,4 +1,4 @@
-function installMatBox(mode, installationFolder)
+function [installPath, installMethod] = installMatBox(mode, installationFolder)
 % installMatBox - Install MatBox from latest release or latest commit
 
     arguments
@@ -7,16 +7,24 @@ function installMatBox(mode, installationFolder)
     end
     
     if mode == "release"
-        installFromRelease() % local function
+        [installPath, installMethod] = installFromRelease(); % local function
     elseif mode == "commit"
-        installFromCommit(installationFolder) % local function
+        [installPath, installMethod] = installFromCommit(installationFolder); % local function
+    end
+
+    if ~nargout
+        clear installPath installMethod
+    elseif nargout == 1
+        clear installPath
     end
 end
 
-function installFromRelease()
+function [installPath, installMethod] = installFromRelease()
     addonsTable = matlab.addons.installedAddons();
     isMatchedAddon = addonsTable.Name == "MatBox";
     
+    [installPath, installMethod] = deal(string(missing));
+
     if ~isempty(isMatchedAddon) && any(isMatchedAddon)
         matlab.addons.enableAddon('MatBox')
     else
@@ -32,10 +40,11 @@ function installFromRelease()
         
         % Install toolbox
         matlab.addons.install(tempFilePath);
+        installMethod = "mltbx";
     end
 end
 
-function installFromCommit(installationFolder)
+function [installPath, installMethod] = installFromCommit(installationFolder)
     
     % Download latest zipped version of repo
     url = "https://github.com/ehennestad/MatBox/archive/refs/heads/main.zip";
@@ -58,4 +67,8 @@ function installFromCommit(installationFolder)
     % Add to MATLAB's search path. Important: Only add code folder
     addpath(genpath(fullfile(targetFolder, 'code')))
     savepath()
+    
+    % Assign outputs
+    installPath = targetFolder;
+    installMethod = "folder";
 end
