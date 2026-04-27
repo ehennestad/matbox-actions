@@ -21,7 +21,7 @@ runs:
   using: "composite"
   steps:
     - name: Download test reports
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         pattern: reports-*
         path: docs/reports
@@ -33,7 +33,7 @@ runs:
       # test-report into a subfolder using the artifact names as subfolder name
     
     - name: Generate "tested with" badge
-      uses: matlab-actions/run-command@v2
+      uses: matlab-actions/run-command@v3
       with:
         command: |
           addpath(genpath("${{ inputs.tools_directory }}"));
@@ -58,7 +58,7 @@ runs:
 
     - name: Checkout existing gh-badges branch
       if: steps.check_branch.outputs.branch_exists == 'true'
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         ref: gh-badges
         path: gh-badges

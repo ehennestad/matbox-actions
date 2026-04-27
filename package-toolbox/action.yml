@@ -27,7 +27,7 @@ runs:
   steps:
     - name: Package toolbox
       id: package
-      uses: matlab-actions/run-command@v2
+      uses: matlab-actions/run-command@v3
       env:
         GITHUB_TOKEN: ${{ github.token }}
       with:

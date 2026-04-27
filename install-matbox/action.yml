@@ -9,7 +9,7 @@ runs:
   using: "composite"
   steps:
       - name: Install MatBox
-        uses: matlab-actions/run-command@v2
+        uses: matlab-actions/run-command@v3
         env:
            GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -18,7 +18,7 @@ runs:
             installMatBox( "${{ inputs.mode }}", "${{ runner.temp }}/matbox" )
       
       - name: Confirm installation of MatBox
-        uses: matlab-actions/run-command@v2
+        uses: matlab-actions/run-command@v3
         with:
           command: |
             versionStr = matbox.toolboxversion();

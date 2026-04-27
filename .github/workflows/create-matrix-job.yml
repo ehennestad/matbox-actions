@@ -45,7 +45,7 @@ jobs:
       matlab_versions: ${{ steps.configure_test_matrix.outputs.matlab_versions }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Check for MLToolboxInfo.json
         run: |

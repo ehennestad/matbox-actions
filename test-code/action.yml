@@ -24,7 +24,7 @@ runs:
   using: "composite"
   steps:
     - name: Run MATLAB test suites
-      uses: matlab-actions/run-command@v2
+      uses: matlab-actions/run-command@v3
       if: always()
       with:
         command: |
