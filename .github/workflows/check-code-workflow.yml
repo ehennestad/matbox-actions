@@ -20,7 +20,7 @@ on:
         type: boolean
         default: false
       update_badges:
-        description: Whether push events should generate and commit badge updates to the checked-out branch.
+        description: Whether push events and ready pull requests should generate and commit badge updates.
         type: boolean
         default: true
 
@@ -47,11 +47,11 @@ jobs:
         with:
           source_directory: ${{ inputs.source_directory }}
           tools_directory: ${{ inputs.tools_directory }}
-          create_badge: ${{ inputs.update_badges && github.event_name == 'push' }}
+          create_badge: ${{ inputs.update_badges && (github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.draft && github.event.pull_request.head.repo.full_name == github.repository)) }}
       
       - name: Commit SVG badges if updated
-        if: ${{ inputs.update_badges && github.event_name == 'push' }}
+        if: ${{ inputs.update_badges && (github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.draft && github.event.pull_request.head.repo.full_name == github.repository)) }}
         uses: ehennestad/matbox-actions/push-badges@v1
         with:
-          pr-ref: ${{ github.ref_name }}
-          pr-repo: ${{ github.repository }}
+          pr-ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || github.ref_name }}
+          pr-repo: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}

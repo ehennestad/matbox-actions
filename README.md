@@ -105,9 +105,9 @@ jobs:
 
 ## Badge Updates
 
-The reusable code analysis and test workflows commit generated badges on `push` events by default. They do not commit badge updates during `pull_request` workflows; pull requests should rely on GitHub checks, workflow summaries, artifacts, and annotations.
+The reusable code analysis and test workflows commit generated badges on `push` events and ready pull requests by default. Draft pull requests skip badge generation and badge commits.
 
-Use the `update_badges` input to opt out of badge commits or restrict them to stable branches:
+Use the `update_badges` input to opt out of badge commits or restrict stable branch updates:
 
 ```yaml
 jobs:
@@ -121,7 +121,7 @@ jobs:
       ) }}
 ```
 
-If `update_badges` is omitted, badge updates run for all `push` events and are skipped for pull requests.
+If `update_badges` is omitted, badge updates run for all `push` events and same-repository pull requests that are ready for review. To run badge updates when a draft pull request becomes ready, include the `ready_for_review` activity type in the calling workflow's `pull_request` trigger.
 
 ## Workflow Templates
 
