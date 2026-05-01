@@ -14,6 +14,9 @@ The motivation is to provide automated code quality analysis for MATLAB toolboxe
 
     # Directory containing codecheckToolbox function (optional)
     tools_directory: './tools'
+
+    # Whether to create code analysis badges (optional)
+    create_badge: 'true'
 ```
 
 > [!NOTE]  
@@ -67,6 +70,7 @@ This example illustrates how the action can be used to perform automated code qu
 |-------|-------------|
 | `source_directory` | [Optional] Directory containing source code to analyze (default: './src') |
 | `tools_directory` | [Optional] Directory containing codecheckToolbox function (default: './tools') |
+| `create_badge` | [Optional] Whether to create code analysis badges when using the MatBox default task (default: 'true') |
 
 ## Outputs
 

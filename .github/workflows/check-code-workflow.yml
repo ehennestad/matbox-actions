@@ -19,6 +19,10 @@ on:
         description: Whether to cache the MATLAB installation for faster subsequent setups.
         type: boolean
         default: false
+      update_badges:
+        description: Whether push events should generate and commit badge updates to the checked-out branch.
+        type: boolean
+        default: true
 
 jobs:
   analyse_code:
@@ -43,10 +47,11 @@ jobs:
         with:
           source_directory: ${{ inputs.source_directory }}
           tools_directory: ${{ inputs.tools_directory }}
+          create_badge: ${{ inputs.update_badges && github.event_name == 'push' }}
       
       - name: Commit SVG badges if updated
-        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        if: ${{ inputs.update_badges && github.event_name == 'push' }}
         uses: ehennestad/matbox-actions/push-badges@v1
         with:
-          pr-ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || github.ref_name }}
-          pr-repo: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
+          pr-ref: ${{ github.ref_name }}
+          pr-repo: ${{ github.repository }}

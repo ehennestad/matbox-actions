@@ -103,6 +103,26 @@ jobs:
 | [`generate-tested-with-badge`](./generate-tested-with-badge/) | Generate "tested with" badges for MATLAB versions |
 | [`push-badges`](./push-badges/) | Push generated badges to repository |
 
+## Badge Updates
+
+The reusable code analysis and test workflows commit generated badges on `push` events by default. They do not commit badge updates during `pull_request` workflows; pull requests should rely on GitHub checks, workflow summaries, artifacts, and annotations.
+
+Use the `update_badges` input to opt out of badge commits or restrict them to stable branches:
+
+```yaml
+jobs:
+  test:
+    uses: ehennestad/matbox-actions/.github/workflows/test-code-workflow.yml@v1
+    with:
+      update_badges: ${{ github.event_name == 'push' && (
+        github.ref == 'refs/heads/main' ||
+        github.ref == 'refs/heads/dev' ||
+        startsWith(github.ref, 'refs/heads/release/')
+      ) }}
+```
+
+If `update_badges` is omitted, badge updates run for all `push` events and are skipped for pull requests.
+
 ## Workflow Templates
 
 Pre-configured workflow templates are available in [`.github/workflow-templates/`](./.github/workflow-templates/) for common scenarios:
