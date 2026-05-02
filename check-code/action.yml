@@ -12,6 +12,10 @@ inputs:
     description: 'Where the codecheckToolbox function is located'
     required: false
     default: './tools'
+  create_badge:
+    description: 'Whether to create a badge'
+    required: false
+    default: 'true'
 
 runs:
   using: "composite"
@@ -23,10 +27,12 @@ runs:
         command: |
           addpath(genpath("${{ inputs.tools_directory }}"));
           if exist("codecheckToolbox", "file")
-            codecheckToolbox();
+            codecheckToolbox(...
+              "FoldersToCheck", "${{ inputs.source_directory }}");
           else
             matbox.tasks.codecheckToolbox(pwd, ...
-              "FoldersToCheck", "${{ inputs.source_directory }}");
+              "FoldersToCheck", "${{ inputs.source_directory }}", ...
+              "CreateBadge", ${{ inputs.create_badge }});
           end
 
     - name: Upload SARIF file

@@ -103,6 +103,32 @@ jobs:
 | [`generate-tested-with-badge`](./generate-tested-with-badge/) | Generate "tested with" badges for MATLAB versions |
 | [`push-badges`](./push-badges/) | Push generated badges to repository |
 
+## Badge Updates
+
+The reusable code analysis and test workflows handle badges differently depending on the event:
+
+- Draft pull requests run CI without badge generation or badge commits.
+- Ready pull requests generate badges. If `update_badges` is `true`, badge updates are committed back to same-repository pull request branches. If `update_badges` is `false`, the workflow reports whether committed badges are stale and the `Badges current` job fails when they are.
+- Push events generate and commit badge updates when `update_badges` is `true`.
+
+Use the `update_badges` input to opt out of badge commits or restrict stable branch updates:
+
+```yaml
+jobs:
+  test:
+    uses: ehennestad/matbox-actions/.github/workflows/test-code-workflow.yml@v1
+    with:
+      update_badges: ${{ github.event_name == 'push' && (
+        github.ref == 'refs/heads/main' ||
+        github.ref == 'refs/heads/dev' ||
+        startsWith(github.ref, 'refs/heads/release/')
+      ) }}
+```
+
+If `update_badges` is omitted, badge updates run for all `push` events and same-repository pull requests that are ready for review. To run badge logic when a draft pull request becomes ready, include the `ready_for_review` activity type in the calling workflow's `pull_request` trigger.
+
+The reusable workflows also expose a `badges_stale` output. Branch protection cannot require this output directly, but it can require the dependent `Badges current` job.
+
 ## Workflow Templates
 
 Pre-configured workflow templates are available in [`.github/workflow-templates/`](./.github/workflow-templates/) for common scenarios:
