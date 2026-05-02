@@ -23,11 +23,20 @@ on:
         description: Whether push events and ready pull requests should generate and commit badge updates.
         type: boolean
         default: true
+    outputs:
+      badges_stale:
+        description: Whether generated badge files differ from committed badge files.
+        value: ${{ jobs.analyse_code.outputs.badges_stale }}
 
 jobs:
   analyse_code:
     name: Check code
     runs-on: ubuntu-latest
+    outputs:
+      badges_stale: ${{ steps.check_badges.outputs.badges_stale }}
+    env:
+      SHOULD_CREATE_BADGES: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.draft) }}
+      SHOULD_PUSH_BADGES: ${{ inputs.update_badges && (github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.draft && github.event.pull_request.head.repo.full_name == github.repository)) }}
 
     steps:
       - name: Check out repo
@@ -47,11 +56,57 @@ jobs:
         with:
           source_directory: ${{ inputs.source_directory }}
           tools_directory: ${{ inputs.tools_directory }}
-          create_badge: ${{ inputs.update_badges && (github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.draft && github.event.pull_request.head.repo.full_name == github.repository)) }}
+          create_badge: ${{ env.SHOULD_CREATE_BADGES }}
+
+      - name: Check whether generated badges are stale
+        id: check_badges
+        if: always()
+        shell: bash
+        run: |
+          if [[ "$SHOULD_CREATE_BADGES" != "true" ]]; then
+            echo "badges_stale=false" >> "$GITHUB_OUTPUT"
+            echo "Badge generation is disabled for this event."
+            exit 0
+          fi
+
+          if [[ -n "$(git status --porcelain -- .github/badges)" ]]; then
+            echo "badges_stale=true" >> "$GITHUB_OUTPUT"
+            echo "Generated badges differ from committed badges:"
+            git status --short -- .github/badges
+          else
+            echo "badges_stale=false" >> "$GITHUB_OUTPUT"
+            echo "Generated badges match committed badges."
+          fi
       
       - name: Commit SVG badges if updated
-        if: ${{ inputs.update_badges && (github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.draft && github.event.pull_request.head.repo.full_name == github.repository)) }}
+        if: ${{ env.SHOULD_PUSH_BADGES == 'true' }}
         uses: ehennestad/matbox-actions/push-badges@v1
         with:
           pr-ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || github.ref_name }}
           pr-repo: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name || github.repository }}
+
+  badges_current:
+    name: Badges current
+    needs: analyse_code
+    if: ${{ always() && github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check badge freshness
+        shell: bash
+        run: |
+          if [[ "${{ github.event.pull_request.draft }}" == "true" ]]; then
+            echo "Draft pull requests do not require badge updates."
+            exit 0
+          fi
+
+          if [[ "${{ inputs.update_badges }}" == "true" && "${{ github.event.pull_request.head.repo.full_name }}" == "${{ github.repository }}" ]]; then
+            echo "Badge updates are enabled for this pull request."
+            exit 0
+          fi
+
+          if [[ "${{ needs.analyse_code.outputs.badges_stale }}" == "true" ]]; then
+            echo "::error::Generated badges differ from committed badges. Commit updated badge files before merging, or enable update_badges for this workflow."
+            exit 1
+          fi
+
+          echo "Committed badges are current."

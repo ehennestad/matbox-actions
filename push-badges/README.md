@@ -62,6 +62,7 @@ This example illustrates how the action can be used to automatically update badg
 - Checks out target branch in a separate working tree
 - Copies generated badges from workflow to target branch
 - Only commits when actual changes are detected
+- Adds `[skip ci]` to badge update commit messages
 - Uses GitHub Actions bot for commits
 
 ## Inputs
