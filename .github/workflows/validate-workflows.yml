@@ -1,0 +1,67 @@
+name: Validate workflows
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/**/*.yml'
+      - '.github/workflow-templates/*.yml'
+      - '*/action.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/**/*.yml'
+      - '.github/workflow-templates/*.yml'
+      - '*/action.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate_yaml:
+    name: Validate YAML syntax
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Parse workflow and action YAML
+        shell: bash
+        run: |
+          ruby -e '
+            require "psych"
+
+            files = Dir[
+              ".github/workflows/**/*.yml",
+              ".github/workflow-templates/*.yml",
+              "*/action.yml"
+            ]
+
+            abort("No YAML files found") if files.empty?
+
+            files.each do |file|
+              Psych.parse_file(file)
+              puts "ok #{file}"
+            end
+          '
+
+  actionlint:
+    name: Run actionlint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: stable
+
+      - name: Check GitHub workflows and templates
+        shell: bash
+        run: |
+          mapfile -t actionlint_files < <(find .github/workflows .github/workflow-templates -name '*.yml' -print)
+          go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12 -color "${actionlint_files[@]}"
