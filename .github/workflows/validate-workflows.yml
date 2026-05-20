@@ -4,14 +4,14 @@ on:
   push:
     branches: [ main ]
     paths:
-      - '.github/workflows/**'
-      - '.github/workflow-templates/**'
+      - '.github/workflows/**/*.yml'
+      - '.github/workflow-templates/*.yml'
       - '*/action.yml'
   pull_request:
     branches: [ main ]
     paths:
-      - '.github/workflows/**'
-      - '.github/workflow-templates/**'
+      - '.github/workflows/**/*.yml'
+      - '.github/workflow-templates/*.yml'
       - '*/action.yml'
   workflow_dispatch:
 
