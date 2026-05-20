@@ -60,8 +60,8 @@ jobs:
         with:
           go-version: stable
 
-      - name: Check GitHub workflows
+      - name: Check GitHub workflows and templates
         shell: bash
         run: |
-          mapfile -t workflow_files < <(find .github/workflows -name '*.yml' -print)
-          go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12 -color "${workflow_files[@]}"
+          mapfile -t actionlint_files < <(find .github/workflows .github/workflow-templates -name '*.yml' -print)
+          go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12 -color "${actionlint_files[@]}"
