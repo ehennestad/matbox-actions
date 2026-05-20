@@ -48,11 +48,11 @@ runs:
       id: check_branch
       shell: bash
       run: |
-        if git ls-remote --heads origin gh-badges | grep -q gh-badges; then
-          echo "branch_exists=true" >> $GITHUB_OUTPUT
+        if git ls-remote --heads origin gh-badges | grep -Fq "refs/heads/gh-badges"; then
+          echo "branch_exists=true" >> "$GITHUB_OUTPUT"
           echo "gh-badges branch exists"
         else
-          echo "branch_exists=false" >> $GITHUB_OUTPUT
+          echo "branch_exists=false" >> "$GITHUB_OUTPUT"
           echo "gh-badges branch does not exist"
         fi
 
@@ -66,6 +66,8 @@ runs:
     - name: Create gh-badges branch if it doesn't exist
       if: steps.check_branch.outputs.branch_exists == 'false'
       shell: bash
+      env:
+        ACTION_PATH: ${{ github.action_path }}
       run: |
         echo "Creating gh-badges branch..."
         mkdir -p gh-badges
@@ -75,7 +77,7 @@ runs:
         git checkout --orphan gh-badges
         
         # Copy initialization files
-        cp ${{ github.action_path }}/gh-badges-init/* .
+        cp "$ACTION_PATH"/gh-badges-init/* .
         
         git add .
         git config user.name "github-actions[bot]"
@@ -85,17 +87,20 @@ runs:
         
     - name: Push to gh-badges
       shell: bash
+      env:
+        VERSION_NUMBER: ${{ inputs.version_number }}
       run: |
-        mkdir -p gh-badges/.github/badges/v${{ inputs.version_number }}
-        cp .github/badges/v${{ inputs.version_number }}/tested_with.json gh-badges/.github/badges/v${{ inputs.version_number }}/tested_with.json
+        badge_directory="v${VERSION_NUMBER}"
+        mkdir -p "gh-badges/.github/badges/$badge_directory"
+        cp ".github/badges/$badge_directory/tested_with.json" "gh-badges/.github/badges/$badge_directory/tested_with.json"
         cd gh-badges
                   
         git config user.name "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
         # Only proceed with commit and push if changes are detected
-        if [[ $(git add .github/badges/* --dry-run | wc -l) -gt 0 ]]; then
-          git add .github/badges/*
+        git add .github/badges
+        if ! git diff --cached --quiet -- .github/badges; then
           git commit -m "Update tested with badge for release"
           git push origin gh-badges
         else

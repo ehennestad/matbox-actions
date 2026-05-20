@@ -35,12 +35,12 @@ runs:
           
           if [[ "$TAG_MESSAGE" == *"[skip actions]"* ]]; then
             echo "::notice:: Tag annotation contains [skip actions], skipping workflow."
-            echo "skip_workflow=true" >> $GITHUB_OUTPUT
+            echo "skip_workflow=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
         fi
         
-        echo "skip_workflow=false" >> $GITHUB_OUTPUT
+        echo "skip_workflow=false" >> "$GITHUB_OUTPUT"
         
     - name: Set version based on trigger type
       id: set_version
@@ -69,4 +69,4 @@ runs:
         fi
         
         echo "Using version number: $VERSION_NUMBER"
-        echo "version_number=$VERSION_NUMBER" >> $GITHUB_OUTPUT
+        echo "version_number=$VERSION_NUMBER" >> "$GITHUB_OUTPUT"

@@ -19,12 +19,15 @@ runs:
     - name: Commit updated Contents.m file
       shell: bash
       continue-on-error: true
+      env:
+        SOURCE_DIRECTORY: ${{ inputs.source_directory }}
+        VERSION_NUMBER: ${{ inputs.version_number }}
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git status
-        find ${{ inputs.source_directory }} -type f -name Contents.m -exec git add {} +
-        git commit -m "Final check-ins for release v${{ inputs.version_number }} [skip actions]"
+        find "$SOURCE_DIRECTORY" -type f -name Contents.m -exec git add {} +
+        git commit -m "Final check-ins for release v${VERSION_NUMBER} [skip actions]"
         git fetch
         git push
         
@@ -32,31 +35,34 @@ runs:
       shell: bash
       if: always()
       continue-on-error: true
+      env:
+        VERSION_NUMBER: ${{ inputs.version_number }}
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        tag_name="v${VERSION_NUMBER}"
 
         # Delete the existing tag locally if it exists
-        if git tag -l "v${{ inputs.version_number }}" | grep -q "v${{ inputs.version_number }}"; then
-          echo "Deleting existing local tag v${{ inputs.version_number }}"
-          git tag -d "v${{ inputs.version_number }}"
+        if git tag -l "$tag_name" | grep -Fxq "$tag_name"; then
+          echo "Deleting existing local tag $tag_name"
+          git tag -d "$tag_name"
         else
-          echo "Local tag v${{ inputs.version_number }} does not exist"
+          echo "Local tag $tag_name does not exist"
         fi
         
         # Delete the existing tag remotely if it exists
-        if git ls-remote --tags origin | grep -q "refs/tags/v${{ inputs.version_number }}"; then
-          echo "Deleting existing remote tag v${{ inputs.version_number }}"
-          git push origin --delete "v${{ inputs.version_number }}"
+        if git ls-remote --tags origin | grep -Fq "refs/tags/$tag_name"; then
+          echo "Deleting existing remote tag $tag_name"
+          git push origin --delete "$tag_name"
         else
-          echo "Remote tag v${{ inputs.version_number }} does not exist"
+          echo "Remote tag $tag_name does not exist"
         fi
       
         # Create the tag with a message, including [skip actions] to prevent CI workflows
-        git tag -a "v${{ inputs.version_number }}" -m "Release v${{ inputs.version_number }} [skip actions]" 
+        git tag -a "$tag_name" -m "Release $tag_name [skip actions]"
       
         # Push the new tag to the remote repository
-        git push origin "v${{ inputs.version_number }}"
+        git push origin "$tag_name"
         
     - name: Create GitHub release
       uses: ncipollo/release-action@v1

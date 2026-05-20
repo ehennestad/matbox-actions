@@ -48,8 +48,10 @@ runs:
     - name: Assign action outputs
       id: assign_action_output
       shell: bash
+      env:
+        TOOLS_DIRECTORY: ${{ inputs.tools_directory }}
       run: |
-        toolboxName=$(jq -r '.ToolboxOptions.ToolboxName' "${{ inputs.tools_directory }}/MLToolboxInfo.json")
+        toolboxName=$(jq -r '.ToolboxOptions.ToolboxName' "$TOOLS_DIRECTORY/MLToolboxInfo.json")
         mltbxPath=$(cat mltbx_path.txt)
-        echo "toolbox_name=$toolboxName" >> $GITHUB_OUTPUT
-        echo "mltbx_path=$mltbxPath" >> $GITHUB_OUTPUT
+        echo "toolbox_name=$toolboxName" >> "$GITHUB_OUTPUT"
+        echo "mltbx_path=$mltbxPath" >> "$GITHUB_OUTPUT"
