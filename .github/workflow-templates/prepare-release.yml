@@ -60,7 +60,7 @@ jobs:
 
       # Whether to install virtual display for testing. Set to true if tests 
       # are invoking graphical elements (i.e showing figures etc.)
-      needs_virtual_display
+      needs_virtual_display: false
       
     secrets:
       # SSH deploy key for pushing to protected branches. Required for creating

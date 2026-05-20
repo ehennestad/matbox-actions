@@ -23,7 +23,7 @@ jobs:
   # Use the standard matrix building job
   configure_test_matrix:
     name: Build release test matrix
-    uses: ./.github/workflows/create-matrix-job.yml.yml
+    uses: ./.github/workflows/create-matrix-job.yml
     with:
       needs_python: true
 
