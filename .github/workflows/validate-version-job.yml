@@ -15,6 +15,9 @@ on:
       version_number:
         description: 'Validated version number'
         value: ${{ jobs.validate_version.outputs.version_number }}
+      skip_workflow:
+        description: 'Whether to skip the workflow'
+        value: ${{ jobs.validate_version.outputs.skip_workflow }}
 
 jobs:
   validate_version:
@@ -22,7 +25,13 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version_number: ${{ steps.validate.outputs.version_number }}
+      skip_workflow: ${{ steps.validate.outputs.skip_workflow }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
       - name: Validate version
         id: validate
         uses: ehennestad/matbox-actions/validate-version@v1
