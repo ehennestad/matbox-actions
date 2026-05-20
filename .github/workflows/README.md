@@ -128,7 +128,7 @@ jobs:
       ref_name: ${{ github.ref_name }}
 
   configure_test_matrix:
-    uses: ./.github/workflows/create-matrix-job.yml.yml
+    uses: ./.github/workflows/create-matrix-job.yml
     with:
       needs_python: true
 
@@ -197,4 +197,3 @@ jobs:
       
       # Continue with standard steps...
 ```
-

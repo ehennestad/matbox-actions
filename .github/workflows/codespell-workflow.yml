@@ -35,8 +35,8 @@ jobs:
           ignore_words=$(grep -E '^ignore-words-list' "$CONFIG_FILE" | sed 's/^ignore-words-list *= *//')
           
           # Export values as environment variables
-          echo "SKIP=$skip" >> $GITHUB_ENV
-          echo "IGNORE_WORDS_LIST=$ignore_words" >> $GITHUB_ENV
+          echo "SKIP=$skip" >> "$GITHUB_ENV"
+          echo "IGNORE_WORDS_LIST=$ignore_words" >> "$GITHUB_ENV"
 
       - name: Codespell
         uses: codespell-project/actions-codespell@v2
