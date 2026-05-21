@@ -1,0 +1,7 @@
+{
+  "ToolboxOptions": {
+    "MinimumMatlabRelease": "R2022b",
+    "MaximumMatlabRelease": "R2024a",
+    "ToolboxName": "Fixture Toolbox"
+  }
+}

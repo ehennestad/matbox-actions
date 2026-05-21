@@ -86,7 +86,7 @@ This example illustrates how the action can be used to configure a test matrix t
 ## Features
 
 - Determines MATLAB versions from toolbox requirements
-- Applies configuration constraints and version limits
+- Applies the configured minimum MATLAB release
 - Maps compatible Python versions to MATLAB releases
 - Handles version range calculations automatically
 - Supports manual version overrides
@@ -112,9 +112,11 @@ This example illustrates how the action can be used to configure a test matrix t
 ## Version Determination Logic
 
 The action determines MATLAB versions using the following priority order:
-1. **Manual override**: If `matlab_versions` input is provided, those versions are used (filtered by config constraints)
+1. **Manual override**: If `matlab_versions` input is provided, those versions are used (filtered by the configured minimum release and the latest MATLAB release)
 2. **Toolbox requirements**: Reads MinimumMatlabRelease and MaximumMatlabRelease from MLToolboxInfo.json
-3. **Configuration limits**: Applies minimum/maximum constraints from config.json
-4. **API validation**: Validates against latest MATLAB release from MathWorks API
+3. **Configuration minimum**: Applies `minimumMatlabRelease` from config.json as the oldest release supported by these GitHub Actions
+4. **API validation**: Uses the latest MATLAB release from the MathWorks API as the upper bound when the toolbox does not specify MaximumMatlabRelease
 
 The action automatically generates all MATLAB releases (both 'a' and 'b' versions) within the determined range, ensuring comprehensive testing coverage.
+
+When Python is included in the matrix, each MATLAB release uses its configured Python version. If a selected MATLAB release is missing from config.json, the action reuses the Python version from the nearest earlier configured MATLAB release. For example, if R2026a is selected but config.json only goes through R2025b, R2026a uses the R2025b Python version unless a `python_versions` override provides a value for R2026a.
