@@ -48,7 +48,7 @@ runs:
       id: check_branch
       shell: bash
       run: |
-        if git ls-remote --heads origin gh-badges | grep -q gh-badges; then
+        if git ls-remote --heads origin gh-badges | grep -Fq "refs/heads/gh-badges"; then
           echo "branch_exists=true" >> $GITHUB_OUTPUT
           echo "gh-badges branch exists"
         else
@@ -94,8 +94,8 @@ runs:
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
         # Only proceed with commit and push if changes are detected
-        if [[ $(git add .github/badges/* --dry-run | wc -l) -gt 0 ]]; then
-          git add .github/badges/*
+        git add .github/badges
+        if ! git diff --cached --quiet -- .github/badges; then
           git commit -m "Update tested with badge for release"
           git push origin gh-badges
         else

@@ -24,7 +24,14 @@ runs:
     - name: Copy badges to PR branch
       shell: bash
       run: |
-        cp -r .github/badges/* pr-branch/.github/badges/ 2>/dev/null || echo "No badges to copy"
+        shopt -s nullglob
+        badges=(.github/badges/*)
+        mkdir -p pr-branch/.github/badges
+        if ((${#badges[@]})); then
+          cp -r "${badges[@]}" pr-branch/.github/badges/
+        else
+          echo "No badges to copy"
+        fi
 
     # Commit updated SVG badges for the issues and tests (if changed)
     - name: Commit and push SVG badges if updated
@@ -35,8 +42,13 @@ runs:
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git fetch 
 
-        if [[ $(git add .github/badges/* --dry-run | wc -l) -gt 0 ]]; then
-          git add .github/badges
+        if [ ! -d .github/badges ]; then
+          echo "Nothing to commit"
+          exit 0
+        fi
+
+        git add .github/badges
+        if ! git diff --cached --quiet -- .github/badges; then
           git commit -m "Update GitHub badges [skip ci]"
           git push origin HEAD
         else
