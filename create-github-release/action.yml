@@ -37,7 +37,7 @@ runs:
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
         # Delete the existing tag locally if it exists
-        if git tag -l "v${{ inputs.version_number }}" | grep -q "v${{ inputs.version_number }}"; then
+        if git tag -l "v${{ inputs.version_number }}" | grep -Fxq "v${{ inputs.version_number }}"; then
           echo "Deleting existing local tag v${{ inputs.version_number }}"
           git tag -d "v${{ inputs.version_number }}"
         else
@@ -45,7 +45,7 @@ runs:
         fi
         
         # Delete the existing tag remotely if it exists
-        if git ls-remote --tags origin | grep -q "refs/tags/v${{ inputs.version_number }}"; then
+        if git ls-remote --tags origin | grep -Fq "refs/tags/v${{ inputs.version_number }}"; then
           echo "Deleting existing remote tag v${{ inputs.version_number }}"
           git push origin --delete "v${{ inputs.version_number }}"
         else
