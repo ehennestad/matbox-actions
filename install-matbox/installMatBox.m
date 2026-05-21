@@ -15,18 +15,19 @@ function [installPath, installMethod] = installMatBox(mode, installationFolder)
     if ~nargout
         clear installPath installMethod
     elseif nargout == 1
-        clear installPath
+        clear installMethod
     end
 end
 
 function [installPath, installMethod] = installFromRelease()
     addonsTable = matlab.addons.installedAddons();
     isMatchedAddon = addonsTable.Name == "MatBox";
-    
-    [installPath, installMethod] = deal(string(missing));
 
     if ~isempty(isMatchedAddon) && any(isMatchedAddon)
         matlab.addons.enableAddon('MatBox')
+        rehash()
+        installPath = getMatBoxInstallPath();
+        installMethod = "mltbx";
     else
         info = webread('https://api.github.com/repos/ehennestad/MatBox/releases/latest');
         assetNames = {info.assets.name};
@@ -40,6 +41,8 @@ function [installPath, installMethod] = installFromRelease()
         
         % Install toolbox
         matlab.addons.install(tempFilePath);
+        rehash()
+        installPath = getMatBoxInstallPath();
         installMethod = "mltbx";
     end
 end
@@ -71,4 +74,16 @@ function [installPath, installMethod] = installFromCommit(installationFolder)
     % Assign outputs
     installPath = targetFolder;
     installMethod = "folder";
+end
+
+function installPath = getMatBoxInstallPath()
+    installRequirementsFile = string(which("matbox.installRequirements"));
+    if installRequirementsFile == ""
+        installPath = string(missing);
+        return
+    end
+
+    packageFolder = fileparts(installRequirementsFile);
+    codeFolder = fileparts(packageFolder);
+    installPath = string(fileparts(codeFolder));
 end
