@@ -21,41 +21,46 @@ To avoid that, the internal refs depend on where the code lives:
 | Ref a consumer uses            | Meaning                                             |
 |--------------------------------|-----------------------------------------------------|
 | `@v1`                          | Rolling major — latest `v1.x`. Moves on each release.|
-| `@v1.5`                        | Immutable minor release. Reproducible.              |
+| `@v1.5` (or `@v1.5.1`)        | Immutable release. Reproducible.                    |
 | a full commit SHA of `@v1.5`   | No better than `@v1.5`: internal refs still resolve through the `v1.5` tag. Prefer the tag.|
 | `@main`                        | Development tip. Not for consumers.                 |
 
 ## Cutting a release
 
+Both paths below run the same procedure, `scripts/prepare-release.sh`:
+
+1. Rewrite the internal refs from `@main` to the release tag (via
+   `scripts/pin-internal-refs.sh`, which fails if any self-reference escapes
+   the rewrite) on a commit that is tagged but **never pushed to `main`**, so
+   `main` keeps its `@main` refs.
+2. Push only the tag and open a **draft** GitHub release with generated notes.
+   If anything fails partway, the tag is rolled back (locally and, if already
+   pushed, on origin) so a rerun starts clean.
+
+Versions are `MAJOR.MINOR` or `MAJOR.MINOR.PATCH` (e.g. `1.5`, `1.5.1`).
+Patch releases are cut from the current `main` like any other release; there
+is no maintenance-branch flow for patching an old minor once `main` has moved
+on incompatibly.
+
+Then review and **publish** the draft. Publishing triggers
+`_internal-bump-major-tag`, which verifies the release's internal refs are
+pinned and force-moves the major tag (`v1`) onto the release commit.
+Pre-releases are skipped.
+
 ### Preferred: the `Prepare release` workflow
 
 Run the **Prepare release** workflow (`_internal-prepare-release.yml`) from the
-Actions tab, giving it the `MAJOR.MINOR` version (e.g. `1.5`). It:
-
-1. Rewrites the internal refs from `@main` to `@v1.5` (via
-   `scripts/pin-internal-refs.sh`) on a commit that is tagged but **never pushed
-   to `main`**, so `main` keeps its `@main` refs.
-2. Tags that commit `v1.5`, pushes only the tag, and opens a **draft** GitHub
-   release with generated notes.
-
-Then review and **publish** the draft. Publishing triggers
-`_internal-bump-major-tag`, which force-moves the major tag (`v1`) onto the
-release commit. Pre-releases are skipped.
-
-> The workflow creates the draft itself because a tag pushed with
-> `GITHUB_TOKEN` does not trigger further workflow runs.
+Actions tab, giving it the version. The workflow just runs the script from a
+clean checkout of `main`.
 
 ### Alternative: local script
 
-The same release can be cut locally from a clean, up-to-date `main`:
+The same release can be cut locally from a clean, up-to-date `main` (requires
+an authenticated `gh`):
 
 ```bash
 scripts/prepare-release.sh 1.5
 ```
-
-It performs the rewrite on a throwaway branch (leaving `main` untouched), tags
-the commit, pushes only the tag, and opens the draft release via `gh`;
-publishing then triggers `_internal-bump-major-tag` as above.
 
 ## Why `main` keeps `@main`
 

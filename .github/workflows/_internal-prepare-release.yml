@@ -2,20 +2,20 @@ name: Prepare release
 
 # Cut a reproducible release from a workflow_dispatch button.
 #
-# Mirrors scripts/prepare-release.sh: it pins the internal action refs to the
-# release tag (via scripts/pin-internal-refs.sh) on a commit that is tagged but
-# never pushed to main, so main keeps its @main internal refs.
+# The whole procedure lives in scripts/prepare-release.sh; this workflow just
+# runs it from a clean checkout of main. The script pins the internal action
+# refs to the release tag (via scripts/pin-internal-refs.sh) on a commit that
+# is tagged but never pushed to main, pushes only the tag, and opens a draft
+# release — rolling the tag back if anything fails partway.
 #
-# The draft release is created in this job because a tag pushed with
-# GITHUB_TOKEN does not trigger further workflow runs.
-# Publishing the draft is a human action, so it still triggers
+# Publishing the draft is a human action, so it triggers
 # _internal-bump-major-tag, which moves the major tag onto the release commit.
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Release version, MAJOR.MINOR (e.g. 1.5)'
+        description: 'Release version, MAJOR.MINOR or MAJOR.MINOR.PATCH (e.g. 1.5 or 1.5.1)'
         required: true
         type: string
 
@@ -31,37 +31,12 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: main
-          fetch-depth: 0
 
-      - name: Validate version and tag availability
-        env:
-          VERSION: ${{ inputs.version }}
-        run: |
-          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+$ ]]; then
-            echo "::error::version must be MAJOR.MINOR, e.g. 1.5"
-            exit 1
-          fi
-          tag="v${VERSION}"
-          if git ls-remote --tags origin "$tag" | grep -q "refs/tags/${tag}$"; then
-            echo "::error::tag ${tag} already exists"
-            exit 1
-          fi
-
-      - name: Pin internal refs and create release tag
-        env:
-          VERSION: ${{ inputs.version }}
-        run: |
-          tag="v${VERSION}"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          bash scripts/pin-internal-refs.sh main "$tag"
-          git commit -am "Release ${tag}: pin internal action refs"
-          git tag -a "$tag" -m "Release ${tag}"
-          # Push only the tag; main is never modified and keeps its @main refs.
-          git push origin "$tag"
-
-      - name: Create draft release
+      - name: Cut release
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ inputs.version }}
-        run: gh release create "v${VERSION}" --draft --generate-notes --title "v${VERSION}"
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          bash scripts/prepare-release.sh "$VERSION"
