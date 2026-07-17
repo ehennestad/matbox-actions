@@ -60,7 +60,7 @@ function [installPath, installMethod] = installFromRelease(version)
     end
 
     try
-        info = webread(releaseApiUrl);
+        info = webread(releaseApiUrl, githubWebOptions());
     catch ME
         if version ~= "latest"
             error("MatBox:Install:ReleaseNotFound", ...
@@ -73,6 +73,11 @@ function [installPath, installMethod] = installFromRelease(version)
 
     assetNames = {info.assets.name};
     isMltbx = startsWith(assetNames, 'MatBox');
+
+    numMatchingAssets = sum(isMltbx);
+    assert(numMatchingAssets == 1, ...
+        "MatBox:Install:AssetNotFound", ...
+        "Expected exactly one MatBox release asset but found %d.", numMatchingAssets)
 
     mltbx_URL = info.assets(isMltbx).browser_download_url;
 
@@ -126,4 +131,20 @@ function installPath = getMatBoxInstallPath()
     packageFolder = fileparts(installRequirementsFile);
     codeFolder = fileparts(packageFolder);
     installPath = string(fileparts(codeFolder));
+end
+
+function options = githubWebOptions()
+% githubWebOptions - weboptions carrying a GitHub auth header when available
+%
+%   On GitHub-hosted runners the runner IP is shared, so unauthenticated
+%   calls to the GitHub REST API (60 requests/hour per IP) can fail with a
+%   rate-limit error. Authenticating with the workflow token raises the
+%   limit to 5000 requests/hour. Falls back to unauthenticated access when
+%   GITHUB_TOKEN is not set, so local use keeps working.
+
+    options = weboptions();
+    token = string(getenv("GITHUB_TOKEN"));
+    if strlength(token) > 0
+        options.HeaderFields = ["Authorization", "Bearer " + token];
+    end
 end
