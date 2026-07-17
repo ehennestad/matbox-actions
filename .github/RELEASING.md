@@ -14,7 +14,7 @@ To avoid that, the internal refs depend on where the code lives:
 - **On `main`:** internal refs are `@main`, so main is internally consistent and
   can be smoke-tested as a unit before release.
 - **On a release tag `vX.Y`:** internal refs are pinned to that exact tag, so a
-  consumer pinning `@vX.Y` (or its SHA) gets a fully frozen action stack.
+  consumer pinning `@vX.Y` gets a frozen action stack.
 
 ## Ref conventions
 
@@ -22,7 +22,7 @@ To avoid that, the internal refs depend on where the code lives:
 |--------------------------------|-----------------------------------------------------|
 | `@v1`                          | Rolling major — latest `v1.x`. Moves on each release.|
 | `@v1.5`                        | Immutable minor release. Reproducible.              |
-| a full commit SHA of `@v1.5`   | Immutable and reproducible (internal refs are pinned).|
+| a full commit SHA of `@v1.5`   | No better than `@v1.5`: internal refs still resolve through the `v1.5` tag. Prefer the tag.|
 | `@main`                        | Development tip. Not for consumers.                 |
 
 ## Cutting a release

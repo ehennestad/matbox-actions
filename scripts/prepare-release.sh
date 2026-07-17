@@ -4,7 +4,7 @@
 # On main, the reusable workflows reference this repo's own actions with @main
 # so main is internally consistent and testable. A release must instead ship
 # workflows whose internal refs are pinned to the immutable release tag, so that
-# a consumer pinning @vX.Y (or its SHA) gets a fully frozen action stack.
+# a consumer pinning @vX.Y gets a frozen action stack.
 #
 # This script builds that pinned commit off to the side, tags it, pushes ONLY
 # the tag, and opens a draft GitHub release for it. main is never modified: it
