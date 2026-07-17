@@ -1,0 +1,37 @@
+name: Bump major tag
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  bump_major_tag:
+    name: Move major tag to published release
+    # Skip pre-releases so tags like v1.5-rc1 do not move the floating major tag.
+    if: ${{ !github.event.release.prerelease }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Move major tag
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          # Derive the major-only tag (e.g. v1.5 -> v1) and force it onto the release commit.
+          version="${RELEASE_TAG#v}"
+          major="v${version%%.*}"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git tag -f "$major" "$RELEASE_TAG"
+          git push origin "$major" --force
+
+          echo "Moved $major to $RELEASE_TAG"
