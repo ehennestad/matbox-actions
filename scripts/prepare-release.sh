@@ -12,18 +12,19 @@
 # _internal-bump-major-tag, which moves the floating major tag (e.g. v1) onto
 # the release commit.
 #
-# Usage: scripts/prepare-release.sh <MAJOR.MINOR>
+# Usage: scripts/prepare-release.sh <MAJOR.MINOR[.PATCH]>
 #   e.g. scripts/prepare-release.sh 1.5
+#        scripts/prepare-release.sh 1.5.1
 set -euo pipefail
 
 if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <MAJOR.MINOR>   e.g. $0 1.5" >&2
+    echo "Usage: $0 <MAJOR.MINOR[.PATCH]>   e.g. $0 1.5" >&2
     exit 2
 fi
 
 version="$1"
-if [[ ! "$version" =~ ^[0-9]+\.[0-9]+$ ]]; then
-    echo "Error: version must be MAJOR.MINOR, e.g. 1.5" >&2
+if [[ ! "$version" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
+    echo "Error: version must be MAJOR.MINOR or MAJOR.MINOR.PATCH, e.g. 1.5 or 1.5.1" >&2
     exit 2
 fi
 tag="v${version}"
@@ -59,9 +60,27 @@ if git rev-parse -q --verify "refs/tags/${tag}" >/dev/null || \
 fi
 
 releaseBranch="release-tmp-${tag}"
+tagCreated=0
+tagPushed=0
+draftCreated=0
 cleanup() {
-    git switch --quiet main
+    # The tree was verified clean at the start, so any leftover modifications
+    # are this script's own partial rewrite — discard them before leaving the
+    # throwaway branch.
+    git reset --quiet --hard >/dev/null 2>&1 || true
+    git switch --quiet main || true
     git branch -D "$releaseBranch" >/dev/null 2>&1 || true
+    # Roll back a partial release so a rerun starts from a clean slate: the
+    # tag is only kept once the draft release exists.
+    if [ "$draftCreated" -eq 0 ]; then
+        if [ "$tagPushed" -eq 1 ]; then
+            git push --quiet origin ":refs/tags/${tag}" || \
+                echo "Warning: could not delete remote tag ${tag}; delete it manually before retrying." >&2
+        fi
+        if [ "$tagCreated" -eq 1 ]; then
+            git tag -d "$tag" >/dev/null 2>&1 || true
+        fi
+    fi
 }
 trap cleanup EXIT
 
@@ -70,8 +89,11 @@ git switch --quiet -c "$releaseBranch"
 "${scriptDir}/pin-internal-refs.sh" main "$tag"
 git commit --quiet -am "Release ${tag}: pin internal action refs"
 git tag -a "$tag" -m "Release ${tag}"
+tagCreated=1
 git push origin "$tag"
+tagPushed=1
 gh release create "$tag" --draft --generate-notes --title "$tag"
+draftCreated=1
 
 echo
 echo "Pushed tag ${tag} with internal refs pinned to @${tag}. main is unchanged."

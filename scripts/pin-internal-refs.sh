@@ -27,6 +27,11 @@ fi
 fromRef="$1"
 toRef="$2"
 
+# fromRef is interpolated into the ERE patterns below; escape regex
+# metacharacters (and the # sed delimiter) so a dotted ref like v1.5 matches
+# only itself rather than treating '.' as a wildcard.
+fromRefPattern="$(printf '%s' "$fromRef" | sed 's/[][(){}.*+?|^$\\#]/\\&/g')"
+
 repoRoot="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 workflowDir="${repoRoot}/.github/workflows"
 
@@ -34,7 +39,7 @@ changed=0
 for file in "${workflowDir}"/*.yml; do
     [ -e "$file" ] || continue
     sed -i.bak -E \
-        "s#(uses:[[:space:]]*ehennestad/matbox-actions/[^@[:space:]]+)@${fromRef}([[:space:]]|\$)#\1@${toRef}\2#g" \
+        "s#(uses:[[:space:]]*ehennestad/matbox-actions/[^@[:space:]]+)@${fromRefPattern}([[:space:]]|\$)#\1@${toRef}\2#g" \
         "$file"
     if ! cmp -s "$file" "${file}.bak"; then
         echo "Updated $(basename "$file")"
@@ -53,7 +58,7 @@ fi
 # unusual spacing), and releasing with a floating internal ref would defeat the
 # reproducibility this script exists to guarantee. The boundary class permits
 # ref-name characters so that e.g. @main does not match a ref named @main-foo.
-if grep -En "ehennestad/matbox-actions/[^@]*@${fromRef}([^A-Za-z0-9._/-]|\$)" "${workflowDir}"/*.yml; then
+if grep -En "ehennestad/matbox-actions/[^@]*@${fromRefPattern}([^A-Za-z0-9._/-]|\$)" "${workflowDir}"/*.yml; then
     echo "Error: the refs above still point at @${fromRef} after the rewrite." >&2
     exit 1
 fi
