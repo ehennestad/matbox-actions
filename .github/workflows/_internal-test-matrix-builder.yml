@@ -1,0 +1,29 @@
+name: Test matrix builder
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'configure-matlab-test-matrix/**'
+      - '.github/workflows/_internal-test-matrix-builder.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'configure-matlab-test-matrix/**'
+      - '.github/workflows/_internal-test-matrix-builder.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Run matrix builder tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Run tests
+        run: python3 -m unittest discover -s configure-matlab-test-matrix/tests -v

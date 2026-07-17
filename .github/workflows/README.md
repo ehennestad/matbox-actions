@@ -4,10 +4,12 @@ This directory contains reusable GitHub Actions workflows for MATLAB toolbox dev
 
 ## Overview
 
-The workflows are organized into two levels:
+The reusable workflows are organized into two levels:
 
-1. **Complete Workflows** (`reusable-workflow_*`): Full end-to-end processes
-2. **Job Workflows** (`reusable-job_*`): Individual job components that can be mixed and matched
+1. **Complete Workflows** (`*-workflow.yml`): Full end-to-end processes
+2. **Job Workflows** (`*-job.yml`): Individual job components that can be mixed and matched
+
+Reusable workflows are intended for downstream MATLAB toolbox repositories. Workflows prefixed with `_internal-` are maintenance workflows for this repository only and are not part of the reusable workflow API.
 
 ## Complete Workflows
 
