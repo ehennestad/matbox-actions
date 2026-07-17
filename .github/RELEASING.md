@@ -42,9 +42,8 @@ Then review and **publish** the draft. Publishing triggers
 `_internal-bump-major-tag`, which force-moves the major tag (`v1`) onto the
 release commit. Pre-releases are skipped.
 
-> The workflow creates the draft itself rather than relying on
-> `_internal-draft-release`, because a tag pushed with `GITHUB_TOKEN` does not
-> trigger further workflow runs.
+> The workflow creates the draft itself because a tag pushed with
+> `GITHUB_TOKEN` does not trigger further workflow runs.
 
 ### Alternative: local script
 
@@ -55,8 +54,7 @@ scripts/prepare-release.sh 1.5
 ```
 
 It performs the rewrite on a throwaway branch (leaving `main` untouched), tags
-the commit, and pushes only the tag. Because the tag is pushed with your own
-credentials, this path triggers `_internal-draft-release` to open the draft;
+the commit, pushes only the tag, and opens the draft release via `gh`;
 publishing then triggers `_internal-bump-major-tag` as above.
 
 ## Why `main` keeps `@main`

@@ -44,5 +44,16 @@ for file in "${workflowDir}"/*.yml; do
 done
 
 if [ "$changed" -eq 0 ]; then
-    echo "No internal refs matched @${fromRef}" >&2
+    echo "Error: no internal refs matched @${fromRef}; nothing was rewritten." >&2
+    exit 1
+fi
+
+# Verify the rewrite was complete. A self-reference still on @<from-ref> means
+# it is written in a form the sed pattern above does not cover (quoting,
+# unusual spacing), and releasing with a floating internal ref would defeat the
+# reproducibility this script exists to guarantee. The boundary class permits
+# ref-name characters so that e.g. @main does not match a ref named @main-foo.
+if grep -En "ehennestad/matbox-actions/[^@]*@${fromRef}([^A-Za-z0-9._/-]|\$)" "${workflowDir}"/*.yml; then
+    echo "Error: the refs above still point at @${fromRef} after the rewrite." >&2
+    exit 1
 fi

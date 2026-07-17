@@ -20,6 +20,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Verify internal refs are pinned
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          # A release cut outside the Prepare-release tooling (e.g. drafted by
+          # hand against main) still has @main internal refs; moving the major
+          # tag onto it would point every @v1 consumer at the development tip.
+          # The :(glob) pathspec keeps '*' from crossing directories, matching
+          # the pin script's scope (consumer-facing examples/ keep @v1 refs).
+          if git grep -n "ehennestad/matbox-actions/[^@]*@main" "$RELEASE_TAG" -- ':(glob).github/workflows/*.yml'; then
+            echo "::error::${RELEASE_TAG} still has internal refs on @main (shown above). Cut releases via the Prepare release workflow or scripts/prepare-release.sh; not moving the major tag."
+            exit 1
+          fi
+
       - name: Move major tag
         env:
           RELEASE_TAG: ${{ github.event.release.tag_name }}
