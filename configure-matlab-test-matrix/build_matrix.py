@@ -185,6 +185,14 @@ def run(args: argparse.Namespace) -> dict[str, str]:
         matlab_versions = determine_auto_matlab_versions(toolbox_info, config, args.latest_release)
         print(f"Using auto-determined MATLAB versions: {json.dumps(matlab_versions)}")
 
+    if not matlab_versions:
+        # Fail here with a clear message instead of emitting an empty matrix,
+        # which GitHub Actions rejects with a generic error in the consuming job.
+        raise ValueError(
+            "No MATLAB versions to test: the resolved versions are outside the "
+            f"supported range {config['minimumMatlabRelease']} to {args.latest_release}."
+        )
+
     matrix = build_matrix(matlab_versions, config, python_overrides, include_python)
     output_values = {
         "matlab_versions": json.dumps(matlab_versions, separators=(",", ":")),

@@ -33,13 +33,24 @@ runs:
     - name: Build test matrix
       id: build
       shell: bash
+      # Inputs are passed via environment variables instead of inline ${{ }}
+      # interpolation so quotes in input values cannot break the shell script.
+      env:
+        TOOLS_DIRECTORY: ${{ inputs.tools_directory }}
+        MATLAB_VERSIONS: ${{ inputs.matlab_versions }}
+        PYTHON_VERSIONS: ${{ inputs.python_versions }}
+        INCLUDE_PYTHON: ${{ inputs.include_python }}
       run: |
-        latest_matlab_release=$(curl -s "https://ssd.mathworks.com/supportfiles/ci/matlab-release/v0/latest")
+        latest_matlab_release=$(curl -fsS "https://ssd.mathworks.com/supportfiles/ci/matlab-release/v0/latest")
+        if [ -z "$latest_matlab_release" ]; then
+          echo "Error: could not determine the latest MATLAB release from the MathWorks API"
+          exit 1
+        fi
         echo "Latest MATLAB release from MathWorks API: $latest_matlab_release"
         python3 "${{ github.action_path }}/build_matrix.py" \
           --config-file "${{ github.action_path }}/config.json" \
-          --toolbox-info-file "${{ inputs.tools_directory }}/MLToolboxInfo.json" \
+          --toolbox-info-file "$TOOLS_DIRECTORY/MLToolboxInfo.json" \
           --latest-release "$latest_matlab_release" \
-          --matlab-versions '${{ inputs.matlab_versions }}' \
-          --python-versions '${{ inputs.python_versions }}' \
-          --include-python '${{ inputs.include_python }}'
+          --matlab-versions "$MATLAB_VERSIONS" \
+          --python-versions "$PYTHON_VERSIONS" \
+          --include-python "$INCLUDE_PYTHON"

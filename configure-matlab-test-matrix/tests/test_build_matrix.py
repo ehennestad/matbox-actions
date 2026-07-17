@@ -18,6 +18,17 @@ spec.loader.exec_module(build_matrix)
 
 
 class BuildMatrixTest(unittest.TestCase):
+    def setUp(self):
+        # Unset GITHUB_OUTPUT so tests never append to the real step output
+        # file when the suite runs inside a GitHub Actions job.
+        self._previous_github_output = os.environ.pop("GITHUB_OUTPUT", None)
+
+    def tearDown(self):
+        if self._previous_github_output is None:
+            os.environ.pop("GITHUB_OUTPUT", None)
+        else:
+            os.environ["GITHUB_OUTPUT"] = self._previous_github_output
+
     def run_builder(
         self,
         toolbox_fixture,
@@ -82,6 +93,17 @@ class BuildMatrixTest(unittest.TestCase):
 
         self.assertEqual(json.loads(outputs["matlab_versions"]), ["R2021a", "R2024a"])
 
+    def test_auto_versions_fail_when_toolbox_minimum_is_newer_than_latest(self):
+        with self.assertRaisesRegex(ValueError, "No MATLAB versions to test"):
+            self.run_builder("toolbox_range.json", latest_release="R2021b")
+
+    def test_manual_versions_fail_when_all_are_filtered_out(self):
+        with self.assertRaisesRegex(ValueError, "No MATLAB versions to test"):
+            self.run_builder(
+                "toolbox_range.json",
+                matlab_versions='["R2019a", "R2020b"]',
+            )
+
     def test_python_overrides_merge_with_defaults(self):
         outputs = self.run_builder(
             "toolbox_range.json",
@@ -127,15 +149,9 @@ class BuildMatrixTest(unittest.TestCase):
     def test_writes_github_outputs(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             output_path = Path(temp_dir) / "github_output.txt"
-            previous_output = os.environ.get("GITHUB_OUTPUT")
+            # setUp/tearDown restore the original GITHUB_OUTPUT around each test.
             os.environ["GITHUB_OUTPUT"] = str(output_path)
-            try:
-                self.run_builder("toolbox_range.json", include_python="false")
-            finally:
-                if previous_output is None:
-                    os.environ.pop("GITHUB_OUTPUT", None)
-                else:
-                    os.environ["GITHUB_OUTPUT"] = previous_output
+            self.run_builder("toolbox_range.json", include_python="false")
 
             output_lines = output_path.read_text(encoding="utf-8").splitlines()
 
