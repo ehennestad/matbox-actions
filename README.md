@@ -67,10 +67,10 @@ jobs:
       security-events: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         
       - name: Setup MATLAB
-        uses: matlab-actions/setup-matlab@v2
+        uses: matlab-actions/setup-matlab@v3
           
       - name: Install MatBox
         uses: ehennestad/matbox-actions/install-matbox@v1
@@ -81,6 +81,19 @@ jobs:
       - name: Check Code Quality
         uses: ehennestad/matbox-actions/check-code@v1
 ```
+
+### 3. Required Permissions
+
+The calling workflow must grant the permissions used by the steps it runs:
+
+| Permission | Needed for |
+|------------|------------|
+| `contents: read` | Checking out the repository |
+| `security-events: write` | Uploading the code-analysis SARIF report (`check-code`) |
+| `contents: write` | Committing/pushing badge updates and release tags (`push-badges`, `create-github-release`, reusable test/analyse workflows when `update_badges` is `true`) |
+| `checks: write` | Publishing test results (`test-code`) |
+
+Grant only what a given workflow actually exercises. The reusable `test-code-workflow.yml` and `prepare-release-workflow.yml` need `contents: write` and `checks: write` in addition to the permissions above.
 
 ## Available Actions
 

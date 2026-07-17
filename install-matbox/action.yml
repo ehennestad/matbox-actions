@@ -3,7 +3,7 @@ description: 'Install MatBox in MATLAB on GitHub runner'
 inputs:
   mode:  # mode of installation: release or commit, i.e install a released version or use latest commit
     description: 'Which installation mode to use'
-    required: true
+    required: false
     default: 'release'
   version:
     description: 'MatBox version to install, e.g. "0.9.10". Only applies to release mode.'
