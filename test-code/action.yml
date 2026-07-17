@@ -26,6 +26,11 @@ runs:
     - name: Run MATLAB test suites
       uses: matlab-actions/run-command@v3
       if: always()
+      env:
+        # Ask MatBox to write badge JSON (rendered to SVG below) instead of
+        # rendering SVG in MATLAB via pybadges. Ignored by older MatBox
+        # versions, which write SVG directly.
+        MATBOX_BADGE_FORMAT: json
       with:
         command: |
           addpath(genpath("${{ inputs.source_directory }}"));
@@ -44,6 +49,30 @@ runs:
           else
             matbox.tasks.testToolbox(pwd, testToolboxArgs{:});
           end
+
+    # MatBox writes badge descriptions as JSON files; render them to SVG with
+    # badge-maker (the shields.io reference implementation). Older MatBox
+    # versions write SVG badges directly, in which case no JSON exists and
+    # this step does nothing.
+    - name: Render SVG badges from badge JSON files
+      if: ${{ always() && inputs.create_badge == 'true' }}
+      shell: bash
+      run: |
+        shopt -s nullglob
+        badgeJsonFiles=(docs/reports/badges/*.json)
+        if [ ${#badgeJsonFiles[@]} -eq 0 ]; then
+          echo "No badge JSON files found; nothing to render."
+          exit 0
+        fi
+        mkdir -p .github/badges
+        for jsonFile in "${badgeJsonFiles[@]}"; do
+          name=$(basename "$jsonFile" .json)
+          label=$(jq -r '.label' "$jsonFile")
+          message=$(jq -r '.message' "$jsonFile")
+          color=$(jq -r '.color' "$jsonFile")
+          npx --yes --package badge-maker badge "$label" "$message" ":$color" > ".github/badges/${name}.svg"
+          echo "Rendered .github/badges/${name}.svg"
+        done
 
     - name: Publish test results
       uses: EnricoMi/publish-unit-test-result-action@v2
