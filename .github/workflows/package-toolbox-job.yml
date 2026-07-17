@@ -48,13 +48,13 @@ jobs:
         uses: matlab-actions/setup-matlab@v3
 
       - name: Install MatBox
-        uses: ehennestad/matbox-actions/install-matbox@v1
+        uses: ehennestad/matbox-actions/install-matbox@main
         with:
           version: ${{ inputs.matbox_version }}
 
       # Generate badge
       - name: Generate "tested with" badge
-        uses: ehennestad/matbox-actions/generate-tested-with-badge@v1
+        uses: ehennestad/matbox-actions/generate-tested-with-badge@main
         with:
           version_number: ${{ inputs.version_number }}
           tools_directory: ${{ inputs.tools_directory }}
@@ -64,7 +64,7 @@ jobs:
       # Package toolbox
       - name: Package toolbox
         id: package
-        uses: ehennestad/matbox-actions/package-toolbox@v1
+        uses: ehennestad/matbox-actions/package-toolbox@main
         with:
           version_number: ${{ inputs.version_number }}
           source_directory: ${{ inputs.source_directory }}
@@ -80,7 +80,7 @@ jobs:
 
       # Create GitHub release
       - name: Create GitHub release
-        uses: ehennestad/matbox-actions/create-github-release@v1
+        uses: ehennestad/matbox-actions/create-github-release@main
         with:
           version_number: ${{ inputs.version_number }}
           mltbx_path: ${{ steps.package.outputs.mltbx_path }}

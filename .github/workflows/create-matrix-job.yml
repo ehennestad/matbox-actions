@@ -58,7 +58,7 @@ jobs:
 
       - name: Build test matrix
         id: configure_test_matrix
-        uses: ehennestad/matbox-actions/configure-matlab-test-matrix@v1
+        uses: ehennestad/matbox-actions/configure-matlab-test-matrix@main
         with:
           tools_directory: ${{ inputs.tools_directory }}
           matlab_versions: ${{ inputs.matlab_versions }}

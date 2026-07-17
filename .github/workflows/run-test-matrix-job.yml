@@ -70,13 +70,13 @@ jobs:
           products: ${{ inputs.matlab_products }}
 
       - name: Install MatBox
-        uses: ehennestad/matbox-actions/install-matbox@v1
+        uses: ehennestad/matbox-actions/install-matbox@main
         with:
           version: ${{ inputs.matbox_version }}
 
       # Run all tests in the project.  Put results in a version specific subdirectory
       - name: Run tests
-        uses: ehennestad/matbox-actions/test-code@v1
+        uses: ehennestad/matbox-actions/test-code@main
         with:
           source_directory: ${{ inputs.source_directory }}
           tests_directory: ${{ inputs.tests_directory }}

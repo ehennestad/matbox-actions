@@ -1,0 +1,42 @@
+name: Prepare release
+
+# Cut a reproducible release from a workflow_dispatch button.
+#
+# The whole procedure lives in scripts/prepare-release.sh; this workflow just
+# runs it from a clean checkout of main. The script pins the internal action
+# refs to the release tag (via scripts/pin-internal-refs.sh) on a commit that
+# is tagged but never pushed to main, pushes only the tag, and opens a draft
+# release — rolling the tag back if anything fails partway.
+#
+# Publishing the draft is a human action, so it triggers
+# _internal-bump-major-tag, which moves the major tag onto the release commit.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version, MAJOR.MINOR or MAJOR.MINOR.PATCH (e.g. 1.5 or 1.5.1)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  prepare_release:
+    name: Pin internal refs and tag release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - name: Cut release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          bash scripts/prepare-release.sh "$VERSION"
