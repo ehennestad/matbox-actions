@@ -27,28 +27,37 @@ To avoid that, the internal refs depend on where the code lives:
 
 ## Cutting a release
 
-Releases are cut from a clean, up-to-date `main`:
+### Preferred: the `Prepare release` workflow
+
+Run the **Prepare release** workflow (`_internal-prepare-release.yml`) from the
+Actions tab, giving it the `MAJOR.MINOR` version (e.g. `1.5`). It:
+
+1. Rewrites the internal refs from `@main` to `@v1.5` (via
+   `scripts/pin-internal-refs.sh`) on a commit that is tagged but **never pushed
+   to `main`**, so `main` keeps its `@main` refs.
+2. Tags that commit `v1.5`, pushes only the tag, and opens a **draft** GitHub
+   release with generated notes.
+
+Then review and **publish** the draft. Publishing triggers
+`_internal-bump-major-tag`, which force-moves the major tag (`v1`) onto the
+release commit. Pre-releases are skipped.
+
+> The workflow creates the draft itself rather than relying on
+> `_internal-draft-release`, because a tag pushed with `GITHUB_TOKEN` does not
+> trigger further workflow runs.
+
+### Alternative: local script
+
+The same release can be cut locally from a clean, up-to-date `main`:
 
 ```bash
 scripts/prepare-release.sh 1.5
 ```
 
-The script:
-
-1. Rewrites the internal refs from `@main` to `@v1.5` on a throwaway branch
-   (via `scripts/pin-internal-refs.sh`), so **`main` is never modified**.
-2. Commits that change, tags it `v1.5`, and pushes **only the tag**.
-
-The tag push (with your credentials, not `GITHUB_TOKEN`) then drives the
-existing automation:
-
-- **`_internal-draft-release`** — on the `vX.Y` tag push, opens a draft GitHub
-  release with generated notes.
-- **`_internal-bump-major-tag`** — when you publish that release, force-moves the
-  major tag (`v1`) onto the release commit. Pre-releases are skipped.
-
-So the manual steps are: run the script, then review and **publish** the draft
-release GitHub creates.
+It performs the rewrite on a throwaway branch (leaving `main` untouched), tags
+the commit, and pushes only the tag. Because the tag is pushed with your own
+credentials, this path triggers `_internal-draft-release` to open the draft;
+publishing then triggers `_internal-bump-major-tag` as above.
 
 ## Why `main` keeps `@main`
 
