@@ -34,7 +34,7 @@ jobs:
         uses: matlab-actions/setup-matlab@v3
 
       - name: Install MatBox
-        uses: ehennestad/matbox-actions/install-matbox@v1
+        uses: ehennestad/matbox-actions/install-matbox@main
         with:
           version: ${{ inputs.matbox_version }}
 

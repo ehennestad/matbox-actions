@@ -34,7 +34,7 @@ jobs:
 
       - name: Validate version
         id: validate
-        uses: ehennestad/matbox-actions/validate-version@v1
+        uses: ehennestad/matbox-actions/validate-version@main
         with:
           version: ${{ inputs.version }}
           ref_name: ${{ inputs.ref_name }}
