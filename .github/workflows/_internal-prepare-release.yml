@@ -23,9 +23,18 @@ name: Prepare release
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Release version, MAJOR.MINOR or MAJOR.MINOR.PATCH (e.g. 1.5 or 1.5.1)'
+      bump:
+        description: 'Version bump; the new version is inferred from the latest release tag'
         required: true
+        type: choice
+        options:
+          - minor
+          - patch
+          - major
+        default: minor
+      version:
+        description: 'Explicit version override, MAJOR.MINOR or MAJOR.MINOR.PATCH (e.g. 1.5 or 1.5.1); takes precedence over bump'
+        required: false
         type: string
 
 permissions:
@@ -45,8 +54,9 @@ jobs:
       - name: Cut release
         env:
           GH_TOKEN: ${{ github.token }}
+          BUMP: ${{ inputs.bump }}
           VERSION: ${{ inputs.version }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          bash scripts/prepare-release.sh "$VERSION"
+          bash scripts/prepare-release.sh "${VERSION:-$BUMP}"
