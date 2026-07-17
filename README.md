@@ -95,6 +95,15 @@ The calling workflow must grant the permissions used by the steps it runs:
 
 Grant only what a given workflow actually exercises. The reusable `test-code-workflow.yml` and `prepare-release-workflow.yml` need `contents: write` and `checks: write` in addition to the permissions above.
 
+### 4. Pinning
+
+Reference this repo by version tag:
+
+- `@v1` — latest `v1.x`; recommended, receives fixes automatically.
+- `@v1.5` — an exact release, for reproducible builds.
+
+Do not pin to a commit SHA. The reusable workflows reference this repo's own actions internally by version tag, so a SHA pin on the entry workflow does **not** freeze the nested actions — they still resolve through the release tag, and a SHA that points at a `main` commit will run the development tip.
+
 ## Available Actions
 
 ### Core Actions
