@@ -7,8 +7,9 @@ name: Trigger smoke test
 # Both smoke workflows are triggered: test-code (install, code analysis, tests)
 # and prepare-release (matrix, packaging, draft release, install verification).
 # Together they cover the full action surface; the release path alone skips code
-# analysis. prepare-release gets a unique timestamp version each run so reused
-# tags cannot fail the release step.
+# analysis. prepare-release gets a unique version (0.0.<run_number>) each run so
+# reused tags cannot fail the release step; run_number is kept small so it stays
+# within toolbox version-number limits.
 #
 # Requires a fine-grained PAT with "Actions: read and write" on
 # ehennestad/matbox-actions-smoketest, stored as the SMOKETEST_TRIGGER_TOKEN
@@ -37,6 +38,7 @@ jobs:
       - name: Trigger matbox-actions-smoketest
         env:
           GH_TOKEN: ${{ secrets.SMOKETEST_TRIGGER_TOKEN }}
+          RUN_NUMBER: ${{ github.run_number }}
         run: |
           if [ -z "${GH_TOKEN}" ]; then
             echo "::warning::SMOKETEST_TRIGGER_TOKEN is not set; skipping smoke-test trigger."
@@ -47,8 +49,9 @@ jobs:
           gh workflow run test-code.yml --repo "$smoke_repo" --ref main
           echo "Triggered test-code.yml on $smoke_repo"
 
-          # Unique version per run so a reused tag cannot fail the release step.
-          version="0.0.$(date +%Y%m%d%H%M%S)"
+          # Small, monotonic, unique-per-run version so a reused tag cannot fail
+          # the release step and the patch number stays within toolbox limits.
+          version="0.0.${RUN_NUMBER}"
           gh workflow run prepare-release.yml --repo "$smoke_repo" --ref main \
             -f version="$version"
           echo "Triggered prepare-release.yml on $smoke_repo (version $version)"
