@@ -4,6 +4,12 @@ name: Trigger smoke test
 # matbox-actions-smoketest repo against @main so the just-merged code is
 # exercised end to end in a real consumer toolbox.
 #
+# Both smoke workflows are triggered: test-code (install, code analysis, tests)
+# and prepare-release (matrix, packaging, draft release, install verification).
+# Together they cover the full action surface; the release path alone skips code
+# analysis. prepare-release gets a unique timestamp version each run so reused
+# tags cannot fail the release step.
+#
 # Requires a fine-grained PAT with "Actions: read and write" on
 # ehennestad/matbox-actions-smoketest, stored as the SMOKETEST_TRIGGER_TOKEN
 # secret. The default GITHUB_TOKEN is scoped to this repo and cannot trigger
@@ -36,6 +42,13 @@ jobs:
             echo "::warning::SMOKETEST_TRIGGER_TOKEN is not set; skipping smoke-test trigger."
             exit 0
           fi
-          gh workflow run test-code.yml \
-            --repo ehennestad/matbox-actions-smoketest --ref main
-          echo "Triggered test-code.yml on ehennestad/matbox-actions-smoketest"
+          smoke_repo="ehennestad/matbox-actions-smoketest"
+
+          gh workflow run test-code.yml --repo "$smoke_repo" --ref main
+          echo "Triggered test-code.yml on $smoke_repo"
+
+          # Unique version per run so a reused tag cannot fail the release step.
+          version="0.0.$(date +%Y%m%d%H%M%S)"
+          gh workflow run prepare-release.yml --repo "$smoke_repo" --ref main \
+            -f version="$version"
+          echo "Triggered prepare-release.yml on $smoke_repo (version $version)"
