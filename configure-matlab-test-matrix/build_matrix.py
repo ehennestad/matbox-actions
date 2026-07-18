@@ -11,15 +11,19 @@ from pathlib import Path
 from typing import Any
 
 
-# Match MATLAB release names such as R2025a.
-RELEASE_PATTERN = re.compile(r"^R(?P<year>\d{4})(?P<half>[ab])$")
+# Match MATLAB release names such as R2025a. Case-insensitive: the MathWorks
+# "latest release" API returns a lowercase form (e.g. "r2026a") while
+# MLToolboxInfo.json and workflow inputs use the canonical "R2026a" form.
+RELEASE_PATTERN = re.compile(r"^R(?P<year>\d{4})(?P<half>[ab])$", re.IGNORECASE)
 
 
 def parse_release(release: str) -> tuple[int, str]:
     match = RELEASE_PATTERN.match(release)
     if not match:
         raise ValueError(f"Invalid MATLAB release: {release!r}")
-    return int(match.group("year")), match.group("half")
+    # Normalize the half to lowercase so callers can compare/sort tuples
+    # regardless of the input's case.
+    return int(match.group("year")), match.group("half").lower()
 
 
 def compare_releases(left: str, right: str) -> int:
