@@ -12,10 +12,50 @@
 # _internal-bump-major-tag, which moves the floating major tag (e.g. v1) onto
 # the release commit.
 #
+# Before doing any of that, it refuses to release unless the most recently
+# completed smoke-test runs (test-code.yml and prepare-release.yml on
+# ehennestad/matbox-actions-smoketest's main) both succeeded. This checks the
+# latest run, not one tied to this exact commit — the smoke repo's runs are
+# its own commits, so there is no direct SHA correlation — but since every
+# non-doc push to main dispatches a fresh smoke run, the latest result closely
+# tracks the current tip by the time a release is cut.
+#
 # Usage: scripts/prepare-release.sh <MAJOR.MINOR[.PATCH]>
 #   e.g. scripts/prepare-release.sh 1.5
 #        scripts/prepare-release.sh 1.5.1
 set -euo pipefail
+
+smokeRepo="ehennestad/matbox-actions-smoketest"
+
+check_smoke_workflow() {
+    local workflowFile="$1"
+    local runs status conclusion url
+
+    runs="$(gh run list --repo "$smokeRepo" --workflow "$workflowFile" --branch main \
+        --limit 1 --json status,conclusion,url 2>/dev/null || echo '[]')"
+
+    if [ "$(echo "$runs" | jq 'length')" -eq 0 ]; then
+        echo "Error: no runs of ${workflowFile} found on ${smokeRepo} (main)." >&2
+        echo "Push to main (or dispatch it manually) and let it complete before releasing." >&2
+        exit 1
+    fi
+
+    status="$(echo "$runs" | jq -r '.[0].status')"
+    conclusion="$(echo "$runs" | jq -r '.[0].conclusion')"
+    url="$(echo "$runs" | jq -r '.[0].url')"
+
+    if [ "$status" != "completed" ]; then
+        echo "Error: the latest ${workflowFile} run on ${smokeRepo} (main) is still ${status}." >&2
+        echo "Wait for it to finish, then retry: ${url}" >&2
+        exit 1
+    fi
+    if [ "$conclusion" != "success" ]; then
+        echo "Error: the latest ${workflowFile} run on ${smokeRepo} (main) did not pass (${conclusion})." >&2
+        echo "Fix the regression before releasing: ${url}" >&2
+        exit 1
+    fi
+    echo "Smoke check passed: ${workflowFile} on ${smokeRepo} (main) — ${url}"
+}
 
 if [ "$#" -ne 1 ]; then
     echo "Usage: $0 <MAJOR.MINOR[.PATCH]>   e.g. $0 1.5" >&2
@@ -33,11 +73,15 @@ scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repoRoot="$(cd "${scriptDir}/.." && pwd)"
 cd "$repoRoot"
 
-# Preconditions: gh available, clean tree, on main, in sync with origin, tag
-# is free. gh is checked first so a missing CLI cannot strand a pushed tag
-# without its draft release.
+# Preconditions: gh and jq available, clean tree, on main, in sync with
+# origin, tag is free, smoke tests green. Tooling is checked first so a
+# missing CLI cannot strand a pushed tag without its draft release.
 if ! command -v gh >/dev/null 2>&1; then
     echo "Error: the gh CLI is required to create the draft release." >&2
+    exit 1
+fi
+if ! command -v jq >/dev/null 2>&1; then
+    echo "Error: jq is required to check smoke-test status." >&2
     exit 1
 fi
 if [ -n "$(git status --porcelain)" ]; then
@@ -58,6 +102,10 @@ if git rev-parse -q --verify "refs/tags/${tag}" >/dev/null || \
     echo "Error: tag ${tag} already exists." >&2
     exit 1
 fi
+
+echo "Checking smoke-test status on ${smokeRepo}..."
+check_smoke_workflow "test-code.yml"
+check_smoke_workflow "prepare-release.yml"
 
 releaseBranch="release-tmp-${tag}"
 tagCreated=0

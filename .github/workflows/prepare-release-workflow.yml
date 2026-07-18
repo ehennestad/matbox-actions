@@ -64,6 +64,7 @@ jobs:
   configure_test_matrix:
     name: Configure release test matrix
     needs: validate_version
+    if: needs.validate_version.outputs.skip_workflow != 'true'
     uses: ehennestad/matbox-actions/.github/workflows/create-matrix-job.yml@main
     with:
       tools_directory: ${{ inputs.tools_directory }}
