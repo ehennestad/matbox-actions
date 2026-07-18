@@ -10,6 +10,15 @@ name: Prepare release
 #
 # Publishing the draft is a human action, so it triggers
 # _internal-bump-major-tag, which moves the major tag onto the release commit.
+#
+# The release commit rewrites every workflow file under .github/workflows
+# (pin-internal-refs.sh). GitHub refuses to let the default GITHUB_TOKEN push
+# any commit touching .github/workflows, regardless of the permissions
+# declared below -- this is a hard restriction, not a config knob. Pushing
+# the tag therefore needs a token with the Workflows permission, which only a
+# PAT (or GitHub App token) can carry. RELEASE_TAG_TOKEN is a fine-grained
+# PAT scoped to this repo only, with Contents: Read and write and
+# Workflows: Read and write.
 
 on:
   workflow_dispatch:
@@ -31,6 +40,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: main
+          token: ${{ secrets.RELEASE_TAG_TOKEN }}
 
       - name: Cut release
         env:
