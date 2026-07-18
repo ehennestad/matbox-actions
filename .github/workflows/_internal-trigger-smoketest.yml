@@ -1,0 +1,41 @@
+name: Trigger smoke test
+
+# When the actions or reusable workflows change on main, run the
+# matbox-actions-smoketest repo against @main so the just-merged code is
+# exercised end to end in a real consumer toolbox.
+#
+# Requires a fine-grained PAT with "Actions: read and write" on
+# ehennestad/matbox-actions-smoketest, stored as the SMOKETEST_TRIGGER_TOKEN
+# secret. The default GITHUB_TOKEN is scoped to this repo and cannot trigger
+# workflows in another repo. If the secret is absent the job no-ops.
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - '.github/workflow-templates/**'
+  workflow_dispatch:
+
+concurrency:
+  group: trigger-smoketest
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  trigger:
+    name: Dispatch smoke-test workflow
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger matbox-actions-smoketest
+        env:
+          GH_TOKEN: ${{ secrets.SMOKETEST_TRIGGER_TOKEN }}
+        run: |
+          if [ -z "${GH_TOKEN}" ]; then
+            echo "::warning::SMOKETEST_TRIGGER_TOKEN is not set; skipping smoke-test trigger."
+            exit 0
+          fi
+          gh workflow run test-code.yml \
+            --repo ehennestad/matbox-actions-smoketest --ref main
+          echo "Triggered test-code.yml on ehennestad/matbox-actions-smoketest"
