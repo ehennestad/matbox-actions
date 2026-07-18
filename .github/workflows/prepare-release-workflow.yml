@@ -56,7 +56,7 @@ on:
 jobs:
   validate_version:
     name: Validate version number
-    uses: ehennestad/matbox-actions/.github/workflows/validate-version-job.yml@main
+    uses: ehennestad/matbox-actions/.github/workflows/validate-version-job.yml@v1.5
     with:
       version: ${{ inputs.version }}
       ref_name: ${{ inputs.ref_name }}
@@ -65,7 +65,7 @@ jobs:
     name: Configure release test matrix
     needs: validate_version
     if: needs.validate_version.outputs.skip_workflow != 'true'
-    uses: ehennestad/matbox-actions/.github/workflows/create-matrix-job.yml@main
+    uses: ehennestad/matbox-actions/.github/workflows/create-matrix-job.yml@v1.5
     with:
       tools_directory: ${{ inputs.tools_directory }}
       matlab_versions: ${{ inputs.matlab_versions }}
@@ -76,7 +76,7 @@ jobs:
     name: Run MATLAB tests
     needs: [validate_version, configure_test_matrix]
     if: needs.validate_version.outputs.skip_workflow != 'true'
-    uses: ehennestad/matbox-actions/.github/workflows/run-test-matrix-job.yml@main
+    uses: ehennestad/matbox-actions/.github/workflows/run-test-matrix-job.yml@v1.5
     with:
       matbox_version: ${{ inputs.matbox_version }}
       source_directory: ${{ inputs.source_directory }}
@@ -91,7 +91,7 @@ jobs:
     name: Package toolbox and create draft release
     needs: [test, validate_version]
     if: needs.validate_version.outputs.skip_workflow != 'true'
-    uses: ehennestad/matbox-actions/.github/workflows/package-toolbox-job.yml@main
+    uses: ehennestad/matbox-actions/.github/workflows/package-toolbox-job.yml@v1.5
     with:
       matbox_version: ${{ inputs.matbox_version }}
       version_number: ${{ needs.validate_version.outputs.version_number }}
@@ -104,7 +104,7 @@ jobs:
     name: Verify toolbox installation
     needs: [release, validate_version]
     if: needs.validate_version.outputs.skip_workflow != 'true'
-    uses: ehennestad/matbox-actions/.github/workflows/verify-installation-job.yml@main
+    uses: ehennestad/matbox-actions/.github/workflows/verify-installation-job.yml@v1.5
     with:
       matbox_version: ${{ inputs.matbox_version }}
       toolbox_name: ${{ needs.release.outputs.toolbox_name }}
