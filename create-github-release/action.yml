@@ -61,7 +61,7 @@ runs:
     - name: Create GitHub release
       uses: ncipollo/release-action@v1
       with:
-        draft: true        
+        draft: true
         artifacts: "${{ inputs.mltbx_path }}"
         tag: "v${{ inputs.version_number }}"
         generateReleaseNotes: true

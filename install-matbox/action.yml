@@ -20,7 +20,7 @@ runs:
           command: |
             addpath( "${{ github.action_path }}" )
             installMatBox( "${{ inputs.mode }}", "${{ runner.temp }}/matbox", "Version", "${{ inputs.version }}" )
-      
+
       - name: Confirm installation of MatBox
         uses: matlab-actions/run-command@v3
         with:
