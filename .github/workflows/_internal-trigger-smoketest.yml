@@ -1,0 +1,59 @@
+name: Trigger smoke test
+
+# On every push to main other than documentation-only changes (README/docs
+# edits or workflow-template changes), run the matbox-actions-smoketest repo
+# against @main so the just-merged code is exercised end to end in a real
+# consumer toolbox.
+#
+# Both smoke workflows are triggered: test-code (install, code analysis, tests)
+# and prepare-release (matrix, packaging, draft release, install verification).
+# Together they cover the full action surface; the release path alone skips code
+# analysis. prepare-release gets a unique version (0.0.<run_number>) each run so
+# reused tags cannot fail the release step; run_number starts at 1 and grows
+# slowly at this repo's push frequency, well within toolbox version-number
+# limits.
+#
+# Requires a fine-grained PAT with "Actions: read and write" on
+# ehennestad/matbox-actions-smoketest, stored as the SMOKETEST_TRIGGER_TOKEN
+# secret. The default GITHUB_TOKEN is scoped to this repo and cannot trigger
+# workflows in another repo. The job fails if the secret is missing.
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - '.github/workflow-templates/**'
+  workflow_dispatch:
+
+concurrency:
+  group: trigger-smoketest
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  trigger:
+    name: Dispatch smoke-test workflow
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger matbox-actions-smoketest
+        env:
+          GH_TOKEN: ${{ secrets.SMOKETEST_TRIGGER_TOKEN }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          if [ -z "${GH_TOKEN}" ]; then
+            echo "::error::SMOKETEST_TRIGGER_TOKEN is not set; cannot dispatch the smoke test."
+            exit 1
+          fi
+          smoke_repo="ehennestad/matbox-actions-smoketest"
+
+          gh workflow run test-code.yml --repo "$smoke_repo" --ref main
+          echo "Triggered test-code.yml on $smoke_repo"
+
+          # Monotonic, unique-per-run version so a reused tag cannot fail the
+          # release step; run_number grows slowly at this repo's push frequency.
+          version="0.0.${RUN_NUMBER}"
+          gh workflow run prepare-release.yml --repo "$smoke_repo" --ref main \
+            -f version="$version"
+          echo "Triggered prepare-release.yml on $smoke_repo (version $version)"
