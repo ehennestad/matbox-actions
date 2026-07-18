@@ -1,5 +1,14 @@
 name: Bump major tag
 
+# The major tag is force-moved onto the release commit, which has its
+# internal .github/workflows refs pinned to the release tag (see
+# scripts/pin-internal-refs.sh). GitHub refuses to let the default
+# GITHUB_TOKEN push any ref update that touches .github/workflows content,
+# regardless of the permissions declared below -- the same hard restriction
+# _internal-prepare-release.yml hits when pushing the release tag itself.
+# Reuse RELEASE_TAG_TOKEN (a fine-grained PAT scoped to this repo, with
+# Contents: Read and write and Workflows: Read and write) for the checkout.
+
 on:
   release:
     types: [published]
@@ -19,6 +28,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          token: ${{ secrets.RELEASE_TAG_TOKEN }}
 
       - name: Verify internal refs are pinned
         env:
