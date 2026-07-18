@@ -20,7 +20,7 @@ function [installPath, installMethod] = installMatBox(mode, installationFolder, 
     version = erase(options.Version, textBoundary("start") + "v");
 
     if mode == "release"
-        [installPath, installMethod] = installFromRelease(version); % local function
+        [installPath, installMethod] = installFromRelease(version, installationFolder); % local function
     elseif mode == "commit"
         if version ~= "latest"
             warning("MatBox:Install:VersionIgnored", ...
@@ -36,7 +36,7 @@ function [installPath, installMethod] = installMatBox(mode, installationFolder, 
     end
 end
 
-function [installPath, installMethod] = installFromRelease(version)
+function [installPath, installMethod] = installFromRelease(version, installationFolder)
     addonsTable = matlab.addons.installedAddons();
     isMatchedAddon = addonsTable.Name == "MatBox";
 
@@ -71,34 +71,28 @@ function [installPath, installMethod] = installFromRelease(version)
         end
     end
 
-    assetNames = {info.assets.name};
-    isMltbx = startsWith(assetNames, 'MatBox');
-
-    numMatchingAssets = sum(isMltbx);
-    assert(numMatchingAssets == 1, ...
-        "MatBox:Install:AssetNotFound", ...
-        "Expected exactly one MatBox release asset but found %d.", numMatchingAssets)
-
-    mltbx_URL = info.assets(isMltbx).browser_download_url;
-
-    % Download matbox
-    tempFilePath = websave(tempname, mltbx_URL);
-    cleanupObj = onCleanup(@(fp) delete(tempFilePath));
-
-    % Install toolbox. matlab.addons.install does not reliably enable a
-    % newly installed add-on under -batch (the mode matlab-actions/run-command
-    % uses), so enable it explicitly rather than assume install did.
-    matlab.addons.install(tempFilePath);
-    matlab.addons.enableAddon('MatBox')
-    rehash()
-    installPath = getMatBoxInstallPath();
-    installMethod = "mltbx";
+    % Install from the tagged source archive rather than the packaged .mltbx
+    % release asset. matlab.addons.install is not reliable under -batch (the
+    % mode matlab-actions/run-command always uses): MathWorks documents
+    % add-on installation via -batch as unsupported, and it has been observed
+    % to fail on some MATLAB releases (e.g. R2024b) while working on others
+    % (e.g. R2026a). The tagged archive uses the same addpath/savepath
+    % mechanism as commit-mode installs, which does not depend on -batch
+    % support for the Add-On Manager.
+    url = "https://github.com/ehennestad/MatBox/archive/refs/tags/" + string(info.tag_name) + ".zip";
+    [installPath, installMethod] = installFromArchive(url, installationFolder);
 end
 
 function [installPath, installMethod] = installFromCommit(installationFolder)
-
-    % Download latest zipped version of repo
     url = "https://github.com/ehennestad/MatBox/archive/refs/heads/main.zip";
+    [installPath, installMethod] = installFromArchive(url, installationFolder);
+end
+
+function [installPath, installMethod] = installFromArchive(url, installationFolder)
+% installFromArchive - Download a GitHub source archive (branch or tag) and
+% add its code folder to the path.
+
+    % Download the zipped source archive
     tempFilePath = websave(tempname, url);
     cleanupObj = onCleanup(@(fp) delete(tempFilePath));
 
