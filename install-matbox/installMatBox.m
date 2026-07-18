@@ -85,8 +85,11 @@ function [installPath, installMethod] = installFromRelease(version)
     tempFilePath = websave(tempname, mltbx_URL);
     cleanupObj = onCleanup(@(fp) delete(tempFilePath));
 
-    % Install toolbox
+    % Install toolbox. matlab.addons.install does not reliably enable a
+    % newly installed add-on under -batch (the mode matlab-actions/run-command
+    % uses), so enable it explicitly rather than assume install did.
     matlab.addons.install(tempFilePath);
+    matlab.addons.enableAddon('MatBox')
     rehash()
     installPath = getMatBoxInstallPath();
     installMethod = "mltbx";
