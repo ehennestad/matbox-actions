@@ -93,6 +93,17 @@ class BuildMatrixTest(unittest.TestCase):
 
         self.assertEqual(json.loads(outputs["matlab_versions"]), ["R2021a", "R2024a"])
 
+    def test_manual_versions_are_filtered_when_latest_release_is_lowercase(self):
+        # The MathWorks "latest release" API returns a lowercase release name
+        # (e.g. "r2026a"), unlike the canonical "R2026a" form used elsewhere.
+        outputs = self.run_builder(
+            "toolbox_range.json",
+            latest_release="r2024a",
+            matlab_versions='["R2020b", "R2021a", "R2024a", "R2024b"]',
+        )
+
+        self.assertEqual(json.loads(outputs["matlab_versions"]), ["R2021a", "R2024a"])
+
     def test_auto_versions_fail_when_toolbox_minimum_is_newer_than_latest(self):
         with self.assertRaisesRegex(ValueError, "No MATLAB versions to test"):
             self.run_builder("toolbox_range.json", latest_release="R2021b")
@@ -160,6 +171,17 @@ class BuildMatrixTest(unittest.TestCase):
             'matrix={"MATLABVersion":["R2022b","R2023a","R2023b","R2024a"]}',
             output_lines,
         )
+
+
+class ParseReleaseTest(unittest.TestCase):
+    def test_parse_release_is_case_insensitive(self):
+        self.assertEqual(build_matrix.parse_release("r2026a"), (2026, "a"))
+        self.assertEqual(build_matrix.parse_release("R2026A"), (2026, "a"))
+        self.assertEqual(build_matrix.parse_release("R2026a"), (2026, "a"))
+
+    def test_compare_releases_across_mixed_case(self):
+        self.assertEqual(build_matrix.compare_releases("r2026a", "R2025b"), 1)
+        self.assertEqual(build_matrix.compare_releases("R2025b", "r2026a"), -1)
 
 
 if __name__ == "__main__":
