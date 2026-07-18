@@ -12,13 +12,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-      # Install and confirm in the same run-command step (the same -batch
-      # session). matlab-actions/run-command documents that MATLAB settings
-      # do not persist across separate -batch sessions ("use a single action"
-      # when a later step needs what an earlier one set up), so a fresh
-      # add-on install could appear to succeed here yet be invisible to a
-      # confirmation check made in a subsequent, separate step.
-      - name: Install and confirm MatBox
+      - name: Install MatBox
         uses: matlab-actions/run-command@v3
         env:
            GITHUB_TOKEN: ${{ github.token }}
@@ -26,5 +20,10 @@ runs:
           command: |
             addpath( "${{ github.action_path }}" )
             installMatBox( "${{ inputs.mode }}", "${{ runner.temp }}/matbox", "Version", "${{ inputs.version }}" )
+
+      - name: Confirm installation of MatBox
+        uses: matlab-actions/run-command@v3
+        with:
+          command: |
             versionStr = matbox.toolboxversion();
             assert(~isempty(versionStr), 'Failed to install MatBox.');
