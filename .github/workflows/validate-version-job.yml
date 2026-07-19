@@ -7,6 +7,10 @@ on:
         type: string
         required: false
         description: 'Version number in major.minor.patch format (for manual triggers)'
+      bump:
+        type: string
+        required: false
+        description: "Bump type ('major', 'minor' or 'patch') used to infer the version from the latest release tag when no explicit version is given (for manual triggers)"
       ref_name:
         type: string
         required: false
@@ -37,4 +41,5 @@ jobs:
         uses: ehennestad/matbox-actions/validate-version@main
         with:
           version: ${{ inputs.version }}
+          bump: ${{ inputs.bump }}
           ref_name: ${{ inputs.ref_name }}
