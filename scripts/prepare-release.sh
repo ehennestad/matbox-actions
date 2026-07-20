@@ -20,9 +20,14 @@
 # non-doc push to main dispatches a fresh smoke run, the latest result closely
 # tracks the current tip by the time a release is cut.
 #
-# Usage: scripts/prepare-release.sh <MAJOR.MINOR[.PATCH]>
-#   e.g. scripts/prepare-release.sh 1.5
-#        scripts/prepare-release.sh 1.5.1
+# Usage: scripts/prepare-release.sh <MAJOR.MINOR[.PATCH] | major | minor | patch>
+#   e.g. scripts/prepare-release.sh 1.5      # explicit version
+#        scripts/prepare-release.sh minor    # infer from the latest release tag
+#
+# With a bump keyword the new version is derived from the highest existing
+# vMAJOR.MINOR[.PATCH] tag: major -> (MAJOR+1).0, minor -> MAJOR.(MINOR+1),
+# patch -> MAJOR.MINOR.(PATCH+1). Major and minor releases keep the repo's
+# two-part tag convention; only patch releases carry a third component.
 set -euo pipefail
 
 smokeRepo="ehennestad/matbox-actions-smoketest"
@@ -58,16 +63,25 @@ check_smoke_workflow() {
 }
 
 if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <MAJOR.MINOR[.PATCH]>   e.g. $0 1.5" >&2
+    echo "Usage: $0 <MAJOR.MINOR[.PATCH] | major | minor | patch>   e.g. $0 1.5 or $0 minor" >&2
     exit 2
 fi
 
-version="$1"
-if [[ ! "$version" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
-    echo "Error: version must be MAJOR.MINOR or MAJOR.MINOR.PATCH, e.g. 1.5 or 1.5.1" >&2
-    exit 2
-fi
-tag="v${version}"
+version=""
+bump=""
+case "$1" in
+    major|minor|patch)
+        bump="$1"
+        ;;
+    *)
+        version="$1"
+        if [[ ! "$version" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
+            echo "Error: argument must be a version (MAJOR.MINOR or MAJOR.MINOR.PATCH, e.g. 1.5 or 1.5.1)" \
+                 "or one of: major, minor, patch" >&2
+            exit 2
+        fi
+        ;;
+esac
 
 scriptDir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 repoRoot="$(cd "${scriptDir}/.." && pwd)"
@@ -97,6 +111,26 @@ if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
     echo "Error: local main is not in sync with origin/main." >&2
     exit 1
 fi
+
+# Resolve a bump keyword into a concrete version, now that all tags are
+# fetched. Pure major tags like v1 are floating aliases, so only full
+# vMAJOR.MINOR[.PATCH] release tags count as the latest release.
+if [ -n "$bump" ]; then
+    latestTag="$(git tag --list | grep -E '^v[0-9]+\.[0-9]+(\.[0-9]+)?$' | sort -V | tail -n 1 || true)"
+    if [ -z "$latestTag" ]; then
+        echo "Error: no existing vMAJOR.MINOR[.PATCH] tag to bump from. Pass an explicit version instead." >&2
+        exit 1
+    fi
+    IFS=. read -r latestMajor latestMinor latestPatch <<< "${latestTag#v}"
+    case "$bump" in
+        major) version="$((latestMajor + 1)).0" ;;
+        minor) version="${latestMajor}.$((latestMinor + 1))" ;;
+        patch) version="${latestMajor}.${latestMinor}.$((${latestPatch:-0} + 1))" ;;
+    esac
+    echo "Latest release tag is ${latestTag}; ${bump} bump gives version ${version}."
+fi
+tag="v${version}"
+
 if git rev-parse -q --verify "refs/tags/${tag}" >/dev/null || \
    git ls-remote --tags origin "$tag" | grep -q "refs/tags/${tag}$"; then
     echo "Error: tag ${tag} already exists." >&2

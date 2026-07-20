@@ -5,6 +5,9 @@ inputs:
   version:
     description: 'Version number (for manual triggers)'
     required: false
+  bump:
+    description: "Bump type ('major', 'minor' or 'patch') used to infer the version from the latest release tag when no explicit version is given (for manual triggers)"
+    required: false
   ref_name:
     description: 'GitHub ref name (for tag triggers)'
     required: false
@@ -46,6 +49,8 @@ runs:
       id: set_version
       if: steps.check_skip_actions.outputs.skip_workflow != 'true'
       shell: bash
+      env:
+        INPUT_BUMP: ${{ inputs.bump }}
       run: |
         if [[ -n "${{ inputs.version }}" ]]; then
           # For manual trigger, use the input version
@@ -55,6 +60,26 @@ runs:
             echo "::error:: Input for 'version' ('$VERSION_NUMBER') is not in the expected major.minor.patch format."
             exit 1
           fi
+        elif [[ -n "$INPUT_BUMP" ]]; then
+          # For manual trigger with a bump type, infer the next version from
+          # the highest existing release tag. Requires a checkout that fetched
+          # tags (e.g. fetch-depth: 0).
+          if [[ ! "$INPUT_BUMP" =~ ^(major|minor|patch)$ ]]; then
+            echo "::error:: Input for 'bump' ('$INPUT_BUMP') must be one of: major, minor, patch."
+            exit 1
+          fi
+          LATEST_TAG=$(git tag --list | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -n 1 || true)
+          if [[ -z "$LATEST_TAG" ]]; then
+            echo "::error:: No existing vMAJOR.MINOR.PATCH tag to bump from. Provide an explicit version instead."
+            exit 1
+          fi
+          IFS=. read -r MAJOR MINOR PATCH <<< "${LATEST_TAG#v}"
+          case "$INPUT_BUMP" in
+            major) VERSION_NUMBER="$((MAJOR + 1)).0.0" ;;
+            minor) VERSION_NUMBER="${MAJOR}.$((MINOR + 1)).0" ;;
+            patch) VERSION_NUMBER="${MAJOR}.${MINOR}.$((PATCH + 1))" ;;
+          esac
+          echo "Latest release tag is ${LATEST_TAG}; ${INPUT_BUMP} bump gives version ${VERSION_NUMBER}"
         else
           # For tag trigger, use the tag name
           TAG_NAME="${{ inputs.ref_name }}"
