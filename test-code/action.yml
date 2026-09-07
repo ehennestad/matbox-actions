@@ -31,6 +31,10 @@ runs:
         # rendering SVG in MATLAB via pybadges. Ignored by older MatBox
         # versions, which write SVG directly.
         MATBOX_BADGE_FORMAT: json
+        # Let toolbox setup code authenticate its GitHub API calls. Shared
+        # runners quickly exhaust the unauthenticated rate limit, which
+        # surfaces as a 403 "rate limit exceeded" before any test runs.
+        GITHUB_TOKEN: ${{ github.token }}
       with:
         command: |
           addpath(genpath("${{ inputs.source_directory }}"));
