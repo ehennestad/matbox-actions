@@ -69,3 +69,16 @@ merged back to `main`. Keeping `@main` on `main` is what lets the whole stack be
 tested at `main` before a tag is cut — pointing a consumer (or smoke-test) repo
 at `...@main` exercises main's actions end to end, which pinning to a lagging
 `@v1` never could.
+
+Each release is therefore a dead end off `main`: its parent is a `main` commit,
+and nothing descends from it.
+
+    main:  ... 843cb07 ── 4ad23e1 ── 8ce6eba
+                    │         │          │
+                 b1fefee   ea068fa    f88902f
+                  v1.5      v1.6      v1.6.1
+
+Nothing may assume releases are on `main`. In particular, no release is an
+ancestor of the next one, so GitHub's auto-generated release notes would walk
+back to the last release tagged directly on `main` (v1.4); `prepare-release.sh`
+passes the previous release explicitly with `--notes-start-tag`.
