@@ -30,6 +30,29 @@
 # two-part tag convention; only patch releases carry a third component.
 set -euo pipefail
 
+# Emits a GitHub Actions error annotation (visible on the run summary,
+# without opening the step log) when running in Actions, in addition to the
+# plain stderr line that's the only output when the script runs locally per
+# .github/RELEASING.md. Multi-line messages are %0A-escaped, as the
+# ::error:: workflow command does not accept a literal newline.
+annotate_error() {
+    local message="$1"
+    if [ -n "${GITHUB_ACTIONS:-}" ]; then
+        echo "::error::${message//$'\n'/%0A}" >&2
+    fi
+    echo "Error: ${message}" >&2
+}
+
+# Emits a GitHub Actions notice annotation (visible on the run summary) when
+# running in Actions, in addition to the plain stdout line printed locally.
+annotate_notice() {
+    local message="$1"
+    if [ -n "${GITHUB_ACTIONS:-}" ]; then
+        echo "::notice::${message//$'\n'/%0A}"
+    fi
+    echo "${message}"
+}
+
 smokeRepo="ehennestad/matbox-actions-smoketest"
 
 check_smoke_workflow() {
@@ -40,8 +63,8 @@ check_smoke_workflow() {
         --limit 1 --json status,conclusion,url 2>/dev/null || echo '[]')"
 
     if [ "$(echo "$runs" | jq 'length')" -eq 0 ]; then
-        echo "Error: no runs of ${workflowFile} found on ${smokeRepo} (main)." >&2
-        echo "Push to main (or dispatch it manually) and let it complete before releasing." >&2
+        annotate_error "no runs of ${workflowFile} found on ${smokeRepo} (main).
+Push to main (or dispatch it manually) and let it complete before releasing."
         exit 1
     fi
 
@@ -50,13 +73,13 @@ check_smoke_workflow() {
     url="$(echo "$runs" | jq -r '.[0].url')"
 
     if [ "$status" != "completed" ]; then
-        echo "Error: the latest ${workflowFile} run on ${smokeRepo} (main) is still ${status}." >&2
-        echo "Wait for it to finish, then retry: ${url}" >&2
+        annotate_error "the latest ${workflowFile} run on ${smokeRepo} (main) is still ${status}.
+Wait for it to finish, then retry: ${url}"
         exit 1
     fi
     if [ "$conclusion" != "success" ]; then
-        echo "Error: the latest ${workflowFile} run on ${smokeRepo} (main) did not pass (${conclusion})." >&2
-        echo "Fix the regression before releasing: ${url}" >&2
+        annotate_error "the latest ${workflowFile} run on ${smokeRepo} (main) did not pass (${conclusion}).
+Fix the regression before releasing: ${url}"
         exit 1
     fi
     echo "Smoke check passed: ${workflowFile} on ${smokeRepo} (main) — ${url}"
@@ -76,8 +99,7 @@ case "$1" in
     *)
         version="$1"
         if [[ ! "$version" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]; then
-            echo "Error: argument must be a version (MAJOR.MINOR or MAJOR.MINOR.PATCH, e.g. 1.5 or 1.5.1)" \
-                 "or one of: major, minor, patch" >&2
+            annotate_error "argument must be a version (MAJOR.MINOR or MAJOR.MINOR.PATCH, e.g. 1.5 or 1.5.1) or one of: major, minor, patch"
             exit 2
         fi
         ;;
@@ -91,24 +113,24 @@ cd "$repoRoot"
 # origin, tag is free, smoke tests green. Tooling is checked first so a
 # missing CLI cannot strand a pushed tag without its draft release.
 if ! command -v gh >/dev/null 2>&1; then
-    echo "Error: the gh CLI is required to create the draft release." >&2
+    annotate_error "the gh CLI is required to create the draft release."
     exit 1
 fi
 if ! command -v jq >/dev/null 2>&1; then
-    echo "Error: jq is required to check smoke-test status." >&2
+    annotate_error "jq is required to check smoke-test status."
     exit 1
 fi
 if [ -n "$(git status --porcelain)" ]; then
-    echo "Error: working tree is not clean. Commit or stash changes first." >&2
+    annotate_error "working tree is not clean. Commit or stash changes first."
     exit 1
 fi
 if [ "$(git rev-parse --abbrev-ref HEAD)" != "main" ]; then
-    echo "Error: releases are cut from main." >&2
+    annotate_error "releases are cut from main."
     exit 1
 fi
 git fetch origin --tags --quiet
 if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
-    echo "Error: local main is not in sync with origin/main." >&2
+    annotate_error "local main is not in sync with origin/main."
     exit 1
 fi
 
@@ -118,7 +140,7 @@ fi
 if [ -n "$bump" ]; then
     latestTag="$(git tag --list | grep -E '^v[0-9]+\.[0-9]+(\.[0-9]+)?$' | sort -V | tail -n 1 || true)"
     if [ -z "$latestTag" ]; then
-        echo "Error: no existing vMAJOR.MINOR[.PATCH] tag to bump from. Pass an explicit version instead." >&2
+        annotate_error "no existing vMAJOR.MINOR[.PATCH] tag to bump from. Pass an explicit version instead."
         exit 1
     fi
     IFS=. read -r latestMajor latestMinor latestPatch <<< "${latestTag#v}"
@@ -133,7 +155,7 @@ tag="v${version}"
 
 if git rev-parse -q --verify "refs/tags/${tag}" >/dev/null || \
    git ls-remote --tags origin "$tag" | grep -q "refs/tags/${tag}$"; then
-    echo "Error: tag ${tag} already exists." >&2
+    annotate_error "tag ${tag} already exists."
     exit 1
 fi
 
@@ -174,10 +196,10 @@ git tag -a "$tag" -m "Release ${tag}"
 tagCreated=1
 git push origin "$tag"
 tagPushed=1
-gh release create "$tag" --draft --generate-notes --title "$tag"
+releaseUrl="$(gh release create "$tag" --draft --generate-notes --title "$tag")"
 draftCreated=1
 
 echo
 echo "Pushed tag ${tag} with internal refs pinned to @${tag}. main is unchanged."
-echo "Next: review and publish the draft release for ${tag};"
-echo "publishing moves the major tag (v${version%%.*}) onto the release commit."
+annotate_notice "Draft release ${tag} is ready to review: ${releaseUrl}
+Publishing it moves the major tag (v${version%%.*}) onto the release commit."
