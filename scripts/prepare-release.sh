@@ -12,6 +12,12 @@
 # _internal-bump-major-tag, which moves the floating major tag (e.g. v1) onto
 # the release commit.
 #
+# The draft's notes are generated from the previous release tag explicitly.
+# Release commits are dead ends off main (each carries its own pin commit),
+# so no earlier release is an ancestor of the new one; left to itself GitHub
+# walks back to the last release tagged directly on main and lists every PR
+# since then.
+#
 # Before doing any of that, it refuses to release unless the most recently
 # completed smoke-test runs (test-code.yml and prepare-release.yml on
 # ehennestad/matbox-actions-smoketest's main) both succeeded. This checks the
@@ -153,6 +159,12 @@ if [ -n "$bump" ]; then
 fi
 tag="v${version}"
 
+# Previous release for the notes range: the highest existing release tag that
+# sorts below the new one, so a patch on an older line still compares against
+# its own predecessor rather than the newest release overall.
+previousTag="$( { git tag --list | grep -E '^v[0-9]+\.[0-9]+(\.[0-9]+)?$'; echo "$tag"; } \
+    | sort -V | grep -B1 -x "$tag" | grep -v -x "$tag" || true)"
+
 if git rev-parse -q --verify "refs/tags/${tag}" >/dev/null || \
    git ls-remote --tags origin "$tag" | grep -q "refs/tags/${tag}$"; then
     annotate_error "tag ${tag} already exists."
@@ -196,7 +208,12 @@ git tag -a "$tag" -m "Release ${tag}"
 tagCreated=1
 git push origin "$tag"
 tagPushed=1
-releaseUrl="$(gh release create "$tag" --draft --generate-notes --title "$tag")"
+# The very first release has no predecessor to compare against.
+if [ -n "$previousTag" ]; then
+    releaseUrl="$(gh release create "$tag" --draft --generate-notes --notes-start-tag "$previousTag" --title "$tag")"
+else
+    releaseUrl="$(gh release create "$tag" --draft --generate-notes --title "$tag")"
+fi
 draftCreated=1
 
 echo
