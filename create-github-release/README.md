@@ -1,7 +1,7 @@
 # Action for creating GitHub release
 This action creates a GitHub release with a packaged MATLAB toolbox, handling tag management, file commits, and release notes generation with automated badge integration.
 
-This action is used by MatBox workflows responsible for publishing toolbox releases. It commits any final changes (such as updated Contents.m files), manages Git tags by updating or recreating them as needed, and creates a draft GitHub release with the packaged MLTBX file attached. The action automatically generates release notes and includes "tested with" badges that link to the `gh-badges` branch for version-specific compatibility information.
+This action is used by MatBox workflows responsible for publishing toolbox releases. It commits any final changes (such as updated Contents.m and codemeta.json files), manages Git tags by updating or recreating them as needed, and creates a draft GitHub release with the packaged MLTBX file attached. The action automatically generates release notes and includes "tested with" badges that link to the `gh-badges` branch for version-specific compatibility information.
 
 ## Usage
 ```yaml
@@ -64,7 +64,7 @@ This example illustrates how the action can be used to create a complete release
 
 ## Features
 
-- Commits final changes to Contents.m files before release
+- Commits final changes to Contents.m and codemeta.json files before release
 - Manages Git tags by updating or recreating them as needed
 - Creates draft GitHub releases with packaged MLTBX files
 - Automatically generates release notes
@@ -85,7 +85,7 @@ This action does not produce direct outputs, but creates a draft GitHub release 
 ## Release Process
 
 The action follows this process:
-1. **Commit Changes**: Commits any updated Contents.m files with [skip actions] marker
+1. **Commit Changes**: Commits any updated Contents.m and codemeta.json files with [skip actions] marker
 2. **Tag Management**: Deletes existing tags (local and remote) and creates new ones
 3. **Release Creation**: Creates a draft GitHub release with automatic release notes
 4. **Badge Integration**: Includes "tested with" badges linking to `gh-badges` branch

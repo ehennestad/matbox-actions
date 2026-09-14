@@ -124,6 +124,7 @@ Do not pin to a commit SHA. The reusable workflows reference this repo's own act
 | [`configure-matlab-test-matrix`](./configure-matlab-test-matrix/) | Configure MATLAB version test matrices |
 | [`generate-tested-with-badge`](./generate-tested-with-badge/) | Generate "tested with" badges for MATLAB versions |
 | [`push-badges`](./push-badges/) | Push generated badges to repository |
+| [`update-codemeta`](./update-codemeta/) | Update the release fields of a `codemeta.json` file |
 
 ## Badge Updates
 
@@ -224,6 +225,8 @@ jobs:
     secrets:
       DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
 ```
+
+If the repository root contains a `codemeta.json`, the release workflow updates its `version`, `downloadUrl`, `releaseNotes`, `runtimePlatform` and `dateModified` fields and includes the file in the release check-in commit. All other fields are left untouched. `runtimePlatform` is derived from `MinimumMatlabRelease` and `MaximumMatlabRelease` in `MLToolboxInfo.json`. Repositories without a `codemeta.json` are unaffected.
 
 ## Contributing
 

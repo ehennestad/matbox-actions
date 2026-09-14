@@ -1,0 +1,29 @@
+name: Test codemeta updater
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'update-codemeta/**'
+      - '.github/workflows/_internal-test-codemeta.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'update-codemeta/**'
+      - '.github/workflows/_internal-test-codemeta.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Run update-codemeta tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Run tests
+        run: bash update-codemeta/tests/run_tests.sh

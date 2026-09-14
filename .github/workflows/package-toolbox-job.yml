@@ -78,6 +78,15 @@ jobs:
           path: ${{ steps.package.outputs.mltbx_path }}
           retention-days: 1
 
+      # Update codemeta.json, if the repository has one, so the release
+      # check-in commit and the tag carry metadata for this version.
+      - name: Update codemeta.json
+        uses: ehennestad/matbox-actions/update-codemeta@main
+        with:
+          version_number: ${{ inputs.version_number }}
+          mltbx_path: ${{ steps.package.outputs.mltbx_path }}
+          tools_directory: ${{ inputs.tools_directory }}
+
       # Create GitHub release
       - name: Create GitHub release
         uses: ehennestad/matbox-actions/create-github-release@main

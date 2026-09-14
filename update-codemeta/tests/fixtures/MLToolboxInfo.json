@@ -1,0 +1,8 @@
+{
+    "Namespace" : "example",
+    "ToolboxOptions": {
+        "ToolboxName": "Example Toolbox",
+        "MinimumMatlabRelease": "R2022a",
+        "MaximumMatlabRelease": ""
+    }
+}

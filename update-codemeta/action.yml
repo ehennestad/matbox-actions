@@ -1,0 +1,37 @@
+name: 'Update codemeta.json'
+description: >-
+  Update the release-specific fields of the codemeta.json in the repository root.
+  The action owns version, downloadUrl, releaseNotes, runtimePlatform and
+  dateModified and leaves every other field untouched. Repositories without a
+  codemeta.json are skipped.
+
+inputs:
+  version_number:
+    description: 'Version number of the release without a leading v, e.g. 1.2.3'
+    required: true
+  mltbx_path:
+    description: 'Path to the packaged MLTBX file. Its file name becomes the release asset name in downloadUrl.'
+    required: true
+  tools_directory:
+    description: 'Directory containing MLToolboxInfo.json, which provides the supported MATLAB releases'
+    required: false
+    default: 'tools'
+
+outputs:
+  updated:
+    description: "'true' when codemeta.json was updated, 'false' when the repository has none"
+    value: ${{ steps.update.outputs.updated }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Update codemeta.json
+      id: update
+      shell: bash
+      env:
+        VERSION_NUMBER: ${{ inputs.version_number }}
+        MLTBX_PATH: ${{ inputs.mltbx_path }}
+        TOOLS_DIRECTORY: ${{ inputs.tools_directory }}
+      run: |
+        bash "${{ github.action_path }}/update_codemeta.sh" \
+          "$VERSION_NUMBER" "$MLTBX_PATH" "$TOOLS_DIRECTORY"
