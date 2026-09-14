@@ -1,16 +1,16 @@
-name: Update codemeta
+name: Test codemeta updater
 
 on:
   push:
     branches: [ main ]
     paths:
       - 'update-codemeta/**'
-      - '.github/workflows/_internal-update-codemeta.yml'
+      - '.github/workflows/_internal-test-codemeta.yml'
   pull_request:
     branches: [ main ]
     paths:
       - 'update-codemeta/**'
-      - '.github/workflows/_internal-update-codemeta.yml'
+      - '.github/workflows/_internal-test-codemeta.yml'
   workflow_dispatch:
 
 permissions:
