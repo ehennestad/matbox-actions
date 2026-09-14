@@ -55,8 +55,10 @@ repositoryUrl="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"
 tag="v${versionNumber}"
 assetName="$(basename "$mltbxPath")"
 downloadUrl="${repositoryUrl}/releases/download/${tag}/${assetName}"
-# GitHub anchors each release section on the releases page by its tag.
-releaseNotesUrl="${repositoryUrl}/releases#release-${tag}"
+# The tag page is the canonical URL for a release on GitHub and shows only
+# that release's notes. Anchors on the paginated releases list stop working
+# once a release ages off the first page.
+releaseNotesUrl="${repositoryUrl}/releases/tag/${tag}"
 dateModified="${CODEMETA_DATE:-$(date -u +%Y-%m-%d)}"
 
 minimumRelease="$(jq -r '.ToolboxOptions.MinimumMatlabRelease // ""' "$toolboxInfoFile")"

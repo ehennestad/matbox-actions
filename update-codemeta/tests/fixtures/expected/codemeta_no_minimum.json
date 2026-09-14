@@ -8,7 +8,7 @@
   "keywords": [
     "example"
   ],
-  "releaseNotes": "https://github.com/example/example-toolbox/releases#release-v1.2.3",
+  "releaseNotes": "https://github.com/example/example-toolbox/releases/tag/v1.2.3",
   "funder": {
     "@type": "Organization",
     "@id": "https://example.org/funder",

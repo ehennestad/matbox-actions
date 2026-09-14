@@ -104,7 +104,7 @@ This example illustrates the position of the action in a release job: after pack
 |-------|-------|
 | `version` | The `version_number` input |
 | `downloadUrl` | `<repository>/releases/download/v<version>/<mltbx file name>` |
-| `releaseNotes` | `<repository>/releases#release-v<version>`, the anchor GitHub gives each release on the releases page |
+| `releaseNotes` | `<repository>/releases/tag/v<version>`, the release's own page on GitHub |
 | `runtimePlatform` | `MATLAB <minimum> or later`, or `MATLAB <minimum> to <maximum>` when `MaximumMatlabRelease` is set. Left unchanged when `MinimumMatlabRelease` is empty |
 | `dateModified` | The current date in UTC, formatted as `YYYY-MM-DD` |
 
