@@ -109,3 +109,5 @@ This example illustrates the position of the action in a release job: after pack
 | `dateModified` | The current date in UTC, formatted as `YYYY-MM-DD` |
 
 Fields that do not exist yet are appended to the end of the file. All other fields, including `datePublished`, `dateCreated`, `author` and `license`, are never touched.
+
+The action does not depend on the CodeMeta version. The five fields it writes are schema.org terms present in both the CodeMeta 2.0 and 3.0 contexts, and `@context` is never touched.
