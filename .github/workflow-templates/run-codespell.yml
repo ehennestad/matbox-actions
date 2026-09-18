@@ -1,7 +1,7 @@
 name: Run Codespell
 
-# NB: Will only process "skip" and "ignore-words-list" from the codespell 
-# config file if provided
+# NB: Codespell finds a .codespellrc in the repository root by itself.
+# Set config_file below only for a config file kept somewhere else.
 
 on:
   push:
@@ -18,7 +18,6 @@ jobs:
   run-codespell:
     name: Run Codespell
     uses: ehennestad/matbox-actions/.github/workflows/codespell-workflow.yml@v1
-    with:
-      # Specify the path of a codespell config file relative to the repository 
-      # root directory
-      config_file: .codespellrc
+    # with:
+    #   # Path of a codespell config file, relative to the repository root
+    #   config_file: .config/codespell.cfg
