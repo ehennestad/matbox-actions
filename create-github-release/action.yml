@@ -16,15 +16,16 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Commit updated Contents.m and codemeta.json files
+    - name: Commit updated Contents.m, codemeta.json and CITATION.cff files
       shell: bash
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
         find ${{ inputs.source_directory }} -type f -name Contents.m -exec git add {} +
         if [ -f codemeta.json ]; then git add codemeta.json; fi
+        if [ -f CITATION.cff ]; then git add CITATION.cff; fi
         if git diff --cached --quiet; then
-          echo "No Contents.m or codemeta.json changes to commit"
+          echo "No Contents.m, codemeta.json or CITATION.cff changes to commit"
         else
           git commit -m "Final check-ins for release v${{ inputs.version_number }} [skip actions]"
           git fetch
