@@ -125,6 +125,7 @@ Do not pin to a commit SHA. The reusable workflows reference this repo's own act
 | [`generate-tested-with-badge`](./generate-tested-with-badge/) | Generate "tested with" badges for MATLAB versions |
 | [`push-badges`](./push-badges/) | Push generated badges to repository |
 | [`update-codemeta`](./update-codemeta/) | Update the release fields of a `codemeta.json` file |
+| [`update-citation`](./update-citation/) | Update the release fields of a `CITATION.cff` file |
 
 ## Badge Updates
 
@@ -227,6 +228,8 @@ jobs:
 ```
 
 If the repository root contains a `codemeta.json`, the release workflow updates its `version`, `downloadUrl`, `releaseNotes`, `runtimePlatform` and `dateModified` fields and includes the file in the release check-in commit. All other fields are left untouched. `runtimePlatform` is derived from `MinimumMatlabRelease` and `MaximumMatlabRelease` in `MLToolboxInfo.json`. Repositories without a `codemeta.json` are unaffected.
+
+In the same way, if the repository root contains a `CITATION.cff`, the release workflow sets its `version` and `date-released` and includes it in the release check-in commit, leaving every other line of the file as it was. Repositories without a `CITATION.cff` are unaffected.
 
 ## Contributing
 

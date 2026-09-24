@@ -1,0 +1,23 @@
+# Citation metadata for the example toolbox
+cff-version: 1.2.0
+message: "If you use this toolbox, please cite it as below."
+type: software
+title: "Example Toolbox"
+abstract: >-
+  A toolbox used as a fixture. This folded block must come out of the
+  update exactly as it went in.
+authors:
+  - given-names: Ada
+    family-names: Example
+version: 1.0.0
+date-released: 2025-01-01
+license: MIT
+preferred-citation:
+  type: article
+  title: "The paper about the example toolbox"
+  version: 2
+  authors:
+    - given-names: Ada
+      family-names: Example
+keywords:
+  - example

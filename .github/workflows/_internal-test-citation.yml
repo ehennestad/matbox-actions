@@ -1,0 +1,29 @@
+name: Test citation updater
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'update-citation/**'
+      - '.github/workflows/_internal-test-citation.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'update-citation/**'
+      - '.github/workflows/_internal-test-citation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Run update-citation tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Run tests
+        run: bash update-citation/tests/run_tests.sh

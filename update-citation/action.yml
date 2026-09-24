@@ -1,0 +1,26 @@
+name: 'Update CITATION.cff'
+description: >-
+  Update the release-specific fields of the CITATION.cff in the repository root.
+  The action owns version and date-released and leaves every other line of the
+  file untouched. Repositories without a CITATION.cff are skipped.
+
+inputs:
+  version_number:
+    description: 'Version number of the release without a leading v, e.g. 1.2.3'
+    required: true
+
+outputs:
+  updated:
+    description: "'true' when CITATION.cff was updated, 'false' when the repository has none"
+    value: ${{ steps.update.outputs.updated }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Update CITATION.cff
+      id: update
+      shell: bash
+      env:
+        VERSION_NUMBER: ${{ inputs.version_number }}
+      run: |
+        bash "${{ github.action_path }}/update_citation.sh" "$VERSION_NUMBER"

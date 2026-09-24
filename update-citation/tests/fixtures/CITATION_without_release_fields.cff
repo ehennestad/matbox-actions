@@ -1,0 +1,6 @@
+cff-version: 1.2.0
+message: "If you use this toolbox, please cite it as below."
+title: "Example Toolbox"
+authors:
+  - given-names: Ada
+    family-names: Example
