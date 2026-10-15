@@ -36,7 +36,7 @@ on:
         type: boolean
         default: false
       update_badges:
-        description: Whether push events and ready pull requests should generate and commit badge updates.
+        description: Whether push events and ready pull requests should generate and commit badge updates. In a stack of pull requests, only the top pull request commits badge updates.
         type: boolean
         default: true
     outputs:
@@ -59,7 +59,9 @@ jobs:
     env: # Assign secret to env to be able to use it in "if:" conditional below
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       SHOULD_CREATE_BADGES: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.draft) }}
-      SHOULD_PUSH_BADGES: ${{ inputs.update_badges && (github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.draft && github.event.pull_request.head.repo.full_name == github.repository)) }}
+      # In a stack of pull requests, only the top pull request commits badges. Each layer contains the layers below it,
+      # so badge commits on lower layers edit the same badge lines and conflict with each other.
+      SHOULD_PUSH_BADGES: ${{ inputs.update_badges && (github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.draft && github.event.pull_request.head.repo.full_name == github.repository && (github.event.pull_request.stack == null || github.event.pull_request.stack.position == github.event.pull_request.stack.size))) }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -154,6 +156,11 @@ jobs:
         run: |
           if [[ "${{ github.event.pull_request.draft }}" == "true" ]]; then
             echo "Draft pull requests do not require badge updates."
+            exit 0
+          fi
+
+          if [[ "${{ github.event.pull_request.stack != null && github.event.pull_request.stack.position < github.event.pull_request.stack.size }}" == "true" ]]; then
+            echo "Pull requests below the top of a stack do not require badge updates."
             exit 0
           fi
 
