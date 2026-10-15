@@ -23,7 +23,7 @@ export const ZERO_COUNT_COLOR = '#9f9f9f';
 export const SEVERITIES = [
   { key: 'error', color: '#e05d44', singular: 'error', plural: 'errors' },
   { key: 'warning', color: '#dfb317', singular: 'warning', plural: 'warnings' },
-  { key: 'info', color: '#007ec6', singular: 'info', plural: 'info' },
+  { key: 'info', color: '#3b99dc', singular: 'info', plural: 'info' },
 ];
 
 const BADGE_HEIGHT = 20;
