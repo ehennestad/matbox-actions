@@ -16,6 +16,10 @@ inputs:
     description: 'Whether to create a badge'
     required: false
     default: 'true'
+  segmented_code_issues_badge:
+    description: 'Whether to draw the code issues badge with one segment per severity (errors, warnings, info). MatBox versions that write no issue counts keep the single badge.'
+    required: false
+    default: 'false'
 
 runs:
   using: "composite"
@@ -63,6 +67,21 @@ runs:
           npx --yes --package badge-maker badge "$label" "$message" ":$color" > ".github/badges/${name}.svg"
           echo "Rendered .github/badges/${name}.svg"
         done
+
+    # Redraw the code issues badge from the per-severity counts in its JSON.
+    # Without counts (older MatBox) the script leaves the single badge from
+    # the previous step in place.
+    - name: Render segmented code issues badge
+      if: ${{ always() && inputs.create_badge == 'true' && inputs.segmented_code_issues_badge == 'true' }}
+      shell: bash
+      run: |
+        badgeJsonFile=docs/reports/badges/code_issues.json
+        if [ ! -f "$badgeJsonFile" ]; then
+          echo "No code issues badge JSON found; nothing to render."
+          exit 0
+        fi
+        npm ci --prefix "$GITHUB_ACTION_PATH" --no-audit --no-fund
+        node "$GITHUB_ACTION_PATH/render-segmented-badge.mjs" "$badgeJsonFile" .github/badges/code_issues.svg
 
     - name: Upload SARIF file
       uses: github/codeql-action/upload-sarif@v3

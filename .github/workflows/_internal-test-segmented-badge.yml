@@ -1,0 +1,34 @@
+name: Test segmented badge renderer
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'check-code/**'
+      - '.github/workflows/_internal-test-segmented-badge.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'check-code/**'
+      - '.github/workflows/_internal-test-segmented-badge.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Run segmented badge renderer tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install dependencies
+        working-directory: check-code
+        run: npm ci --no-audit --no-fund
+
+      - name: Run tests
+        working-directory: check-code
+        run: npm test
