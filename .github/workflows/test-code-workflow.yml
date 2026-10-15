@@ -39,6 +39,10 @@ on:
         description: Whether push events and ready pull requests should generate and commit badge updates.
         type: boolean
         default: true
+      create_test_badge:
+        description: Whether to generate the badge that reports test results (.github/badges/tests.svg). The code issues badge is not affected.
+        type: boolean
+        default: true
     outputs:
       badges_stale:
         description: Whether generated badge files differ from committed badge files.
@@ -100,7 +104,7 @@ jobs:
           source_directory: ${{ inputs.source_directory }}
           tests_directory: ${{ inputs.tests_directory }}
           tools_directory: ${{ inputs.tools_directory }}
-          create_badge: ${{ env.SHOULD_CREATE_BADGES }}
+          create_badge: ${{ env.SHOULD_CREATE_BADGES == 'true' && inputs.create_test_badge }}
 
       - name: Check whether generated badges are stale
         id: check_badges
