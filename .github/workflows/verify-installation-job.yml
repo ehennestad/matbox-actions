@@ -19,6 +19,10 @@ on:
         type: string
         default: '["ubuntu-latest", "windows-latest", "macos-latest"]'
         description: 'JSON array of operating systems to test on'
+    secrets:
+      MLM_LICENSE_TOKEN:
+        required: false
+        description: 'MATLAB batch licensing token. Needed to start MATLAB in a private repository. See https://github.com/matlab-actions/setup-matlab#use-matlab-batch-licensing-token'
 
 jobs:
   verify_installation:
@@ -28,6 +32,8 @@ jobs:
       fail-fast: false
       matrix:
         os: ${{ fromJSON(inputs.os_matrix) }}
+    env:
+      MLM_LICENSE_TOKEN: ${{ secrets.MLM_LICENSE_TOKEN }}
 
     steps:
       - name: Set up MATLAB

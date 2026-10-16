@@ -56,6 +56,9 @@ on:
       DEPLOY_KEY:
         required: true
         description: 'SSH deploy key for pushing to protected branches'
+      MLM_LICENSE_TOKEN:
+        required: false
+        description: 'MATLAB batch licensing token. Needed to start MATLAB in a private repository. See https://github.com/matlab-actions/setup-matlab#use-matlab-batch-licensing-token'
 
 jobs:
   validate_version:
@@ -91,6 +94,8 @@ jobs:
       needs_python: ${{ inputs.needs_python }}
       matrix_json: ${{ needs.configure_test_matrix.outputs.matrix }}
       needs_virtual_display: ${{ inputs.needs_virtual_display }}
+    secrets:
+      MLM_LICENSE_TOKEN: ${{ secrets.MLM_LICENSE_TOKEN }}
 
   release:
     name: Package toolbox and create draft release
@@ -104,6 +109,7 @@ jobs:
       tools_directory: ${{ inputs.tools_directory }}
     secrets:
       DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+      MLM_LICENSE_TOKEN: ${{ secrets.MLM_LICENSE_TOKEN }}
 
   verify_installation:
     name: Verify toolbox installation
@@ -114,3 +120,5 @@ jobs:
       matbox_version: ${{ inputs.matbox_version }}
       toolbox_name: ${{ needs.release.outputs.toolbox_name }}
       tools_directory: ${{ inputs.tools_directory }}
+    secrets:
+      MLM_LICENSE_TOKEN: ${{ secrets.MLM_LICENSE_TOKEN }}
