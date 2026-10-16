@@ -7,7 +7,7 @@ This directory contains GitHub workflow templates for MATLAB toolbox development
 ### Code Analysis and Testing
 
 - **`analyse-code.yml`** - Runs code analysis on MATLAB code using MatBox tools
-- **`test-code.yml`** - Comprehensive testing workflow that runs code analysis and unit tests
+- **`run-tests.yml`** - Comprehensive testing workflow that runs code analysis and unit tests
 - **`run-codespell.yml`** - Spell checking workflow for documentation and comments
 
 ### Release Management

@@ -1,4 +1,4 @@
-name: Test code
+name: Run tests
 
 on:
   push:
@@ -21,7 +21,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test-code:
+  run-tests:
     name: Analyse and test code
     uses: ehennestad/matbox-actions/.github/workflows/test-code-workflow.yml@v1
     with:
