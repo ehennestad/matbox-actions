@@ -40,9 +40,9 @@ on:
         type: boolean
         default: true
       create_test_badge:
-        description: Whether to generate the badge that reports test results (.github/badges/tests.svg). The code issues badge is not affected.
+        description: Whether to generate the badge that reports test results (.github/badges/tests.svg). The code issues badge is not affected. Off by default; the calling workflow's GitHub status badge reports whether tests pass.
         type: boolean
-        default: true
+        default: false
     outputs:
       badges_stale:
         description: Whether generated badge files differ from committed badge files.

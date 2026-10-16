@@ -158,7 +158,7 @@ The reusable workflows also expose a `badges_stale` output. Branch protection ca
 Pre-configured workflow templates are available in [`.github/workflow-templates/`](./.github/workflow-templates/) for common scenarios:
 
 - **`analyse-code.yml`** - Code analysis workflow
-- **`test-code.yml`** - Comprehensive testing workflow  
+- **`run-tests.yml`** - Comprehensive testing workflow
 - **`prepare-release.yml`** - Complete release automation
 - **`run-codespell.yml`** - Spell checking for documentation
 
