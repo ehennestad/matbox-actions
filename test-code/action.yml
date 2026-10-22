@@ -23,6 +23,23 @@ inputs:
 runs:
   using: "composite"
   steps:
+    # Badge JSON files from earlier steps in the job belong to those steps,
+    # which render them. check-code, for example, may draw a segmented code
+    # issues badge that a plain re-render would replace. Record checksums of
+    # the existing files so the render step below skips the ones the test
+    # run leaves unchanged.
+    - name: Record existing badge JSON files
+      if: ${{ always() && inputs.create_badge == 'true' }}
+      shell: bash
+      run: |
+        shopt -s nullglob
+        badgeJsonFiles=(docs/reports/badges/*.json)
+        snapshotFile="$RUNNER_TEMP/matbox-badge-json-before-tests.sha256"
+        : > "$snapshotFile"
+        if [ ${#badgeJsonFiles[@]} -gt 0 ]; then
+          sha256sum "${badgeJsonFiles[@]}" > "$snapshotFile"
+        fi
+
     - name: Run MATLAB test suites
       uses: matlab-actions/run-command@v3
       if: always()
@@ -69,7 +86,12 @@ runs:
           exit 0
         fi
         mkdir -p .github/badges
+        snapshotFile="$RUNNER_TEMP/matbox-badge-json-before-tests.sha256"
         for jsonFile in "${badgeJsonFiles[@]}"; do
+          if [ -f "$snapshotFile" ] && grep -qxF "$(sha256sum "$jsonFile")" "$snapshotFile"; then
+            echo "Skipping $jsonFile: not changed by the test run."
+            continue
+          fi
           name=$(basename "$jsonFile" .json)
           label=$(jq -r '.label' "$jsonFile")
           message=$(jq -r '.message' "$jsonFile")
