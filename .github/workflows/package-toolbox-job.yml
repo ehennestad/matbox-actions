@@ -23,6 +23,9 @@ on:
       DEPLOY_KEY:
         required: true
         description: 'SSH deploy key for pushing to protected branches'
+      MLM_LICENSE_TOKEN:
+        required: false
+        description: 'MATLAB batch licensing token. Needed to start MATLAB in a private repository. See https://github.com/matlab-actions/setup-matlab#use-matlab-batch-licensing-token'
     outputs:
       toolbox_name:
         description: 'Name of the packaged toolbox'
@@ -38,6 +41,8 @@ jobs:
     outputs:
       toolbox_name: ${{ steps.package.outputs.toolbox_name }}
       mltbx_path: ${{ steps.package.outputs.mltbx_path }}
+    env:
+      MLM_LICENSE_TOKEN: ${{ secrets.MLM_LICENSE_TOKEN }}
     steps:
       - name: Checkout repository using deploy key
         uses: actions/checkout@v6

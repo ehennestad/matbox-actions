@@ -31,6 +31,10 @@ on:
       badges_stale:
         description: Whether generated badge files differ from committed badge files.
         value: ${{ jobs.analyse_code.outputs.badges_stale }}
+    secrets:
+      MLM_LICENSE_TOKEN:
+        required: false
+        description: 'MATLAB batch licensing token. Needed to start MATLAB in a private repository. See https://github.com/matlab-actions/setup-matlab#use-matlab-batch-licensing-token'
 
 jobs:
   analyse_code:
@@ -39,6 +43,7 @@ jobs:
     outputs:
       badges_stale: ${{ steps.check_badges.outputs.badges_stale }}
     env:
+      MLM_LICENSE_TOKEN: ${{ secrets.MLM_LICENSE_TOKEN }}
       SHOULD_CREATE_BADGES: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.draft) }}
       SHOULD_PUSH_BADGES: ${{ inputs.update_badges && (github.event_name == 'push' || (github.event_name == 'pull_request' && !github.event.pull_request.draft && github.event.pull_request.head.repo.full_name == github.repository)) }}
 
