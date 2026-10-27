@@ -1,0 +1,12 @@
+{
+  "name": "matbox-check-code-badge",
+  "private": true,
+  "description": "Renders the segmented code issues badge for the check-code action",
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "badge-maker": "6.0.0"
+  }
+}
