@@ -51,11 +51,19 @@ on:
         type: boolean
         default: false
         description: Whether to install virtual display for testing.
+      push_checkins:
+        type: boolean
+        default: true
+        description: 'Whether to commit and push the updated Contents.m, codemeta.json and CITATION.cff files (see create-github-release)'
+      checkin_branch:
+        type: string
+        default: ''
+        description: "Branch to push the check-in commit to instead of the checked-out branch, e.g. 'release/v{version}' (see create-github-release)"
     
     secrets:
       DEPLOY_KEY:
-        required: true
-        description: 'SSH deploy key for pushing to protected branches'
+        required: false
+        description: 'SSH deploy key for pushing to protected branches. Not needed when checkin_branch is unprotected or push_checkins is false.'
 
 jobs:
   validate_version:
@@ -102,6 +110,8 @@ jobs:
       version_number: ${{ needs.validate_version.outputs.version_number }}
       source_directory: ${{ inputs.source_directory }}
       tools_directory: ${{ inputs.tools_directory }}
+      push_checkins: ${{ inputs.push_checkins }}
+      checkin_branch: ${{ inputs.checkin_branch }}
     secrets:
       DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
 

@@ -19,10 +19,18 @@ on:
         type: string
         default: 'tools'
         description: 'Directory containing tools'
+      push_checkins:
+        type: boolean
+        default: true
+        description: 'Whether to commit and push the updated Contents.m, codemeta.json and CITATION.cff files (see create-github-release)'
+      checkin_branch:
+        type: string
+        default: ''
+        description: "Branch to push the check-in commit to instead of the checked-out branch, e.g. 'release/v{version}' (see create-github-release)"
     secrets:
       DEPLOY_KEY:
-        required: true
-        description: 'SSH deploy key for pushing to protected branches'
+        required: false
+        description: 'SSH deploy key for pushing to protected branches. Not needed when checkin_branch is unprotected or push_checkins is false.'
     outputs:
       toolbox_name:
         description: 'Name of the packaged toolbox'
@@ -101,3 +109,5 @@ jobs:
           version_number: ${{ inputs.version_number }}
           mltbx_path: ${{ steps.package.outputs.mltbx_path }}
           source_directory: ${{ inputs.source_directory }}
+          push_checkins: ${{ inputs.push_checkins }}
+          checkin_branch: ${{ inputs.checkin_branch }}

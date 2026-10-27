@@ -92,9 +92,11 @@ Packages the toolbox and creates a GitHub draft release.
 - `version_number` (required): Version number for the release
 - `source_directory` (default: 'src'): Source code directory
 - `tools_directory` (default: 'tools'): Tools directory
+- `push_checkins` (default: true): Whether to commit and push the release check-ins (Contents.m, codemeta.json, CITATION.cff)
+- `checkin_branch` (default: ''): Branch to push the check-in commit to instead of the checked-out branch, e.g. `release/v{version}`. The action substitutes the release version for the literal text `{version}`, so `release/v{version}` becomes `release/v1.2.3` when releasing 1.2.3. The release tag then points at the check-in commit, which joins the default branch's history only if the release pull request is merged with a merge commit.
 
 **Secrets:**
-- `DEPLOY_KEY` (required): SSH deploy key for pushing to protected branches
+- `DEPLOY_KEY` (optional): SSH deploy key for pushing to protected branches. Not needed when `checkin_branch` names an unprotected branch or `push_checkins` is false. Without it, the branch push, the tag push and the tag delete use `GITHUB_TOKEN`, which then needs `contents: write` (grant it in the calling job's `permissions` block or via the repository's default workflow permissions).
 
 **Outputs:**
 - `toolbox_name`: Name of the packaged toolbox

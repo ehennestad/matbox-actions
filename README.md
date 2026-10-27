@@ -231,6 +231,33 @@ If the repository root contains a `codemeta.json`, the release workflow updates 
 
 In the same way, if the repository root contains a `CITATION.cff`, the release workflow sets its `version` and `date-released` and includes it in the release check-in commit, leaving every other line of the file as it was. Repositories without a `CITATION.cff` are unaffected.
 
+By default the check-in commit is pushed to the branch the workflow runs on, which needs a `DEPLOY_KEY` that may push to it if that branch is protected. If your default branch only accepts pull requests, either push the check-ins to a separate branch and open a pull request from it:
+
+```yaml
+    with:
+      checkin_branch: release/v{version}
+```
+
+The action substitutes the release version for the literal text `{version}`, so `release/v{version}` becomes `release/v1.2.3` when releasing 1.2.3. Unlike a push to the checked-out branch, this check-in commit carries no `[skip actions]` marker, so the pull request opened from it gets its checks.
+
+Or skip the check-in commit with `push_checkins: false`. In both cases no `DEPLOY_KEY` is needed, and the packaged MLTBX still contains the updated files. Without a `DEPLOY_KEY`, however, the branch push, the tag push and the tag delete use `GITHUB_TOKEN`, which then needs `contents: write`. The reusable workflows do not set a `permissions` block, so either grant it in the calling workflow:
+
+```yaml
+jobs:
+  release:
+    permissions:
+      contents: write
+      checks: write
+    uses: ehennestad/matbox-actions/.github/workflows/prepare-release-workflow.yml@v1
+```
+
+or set the repository's default workflow permissions to read and write.
+
+The two options differ in where the release tag ends up:
+
+- With `checkin_branch`, the tag points at the check-in commit, one commit off the default branch. It joins the default branch's history only if the release pull request is merged with a merge commit; after a squash or rebase merge the tag stays off the default branch, so `git describe` and any "commits since last release" tooling on that branch will not see it. Installing from the tag is unaffected.
+- With `push_checkins: false`, the tag stays on the default branch, but the version strings in `Contents.m`, `codemeta.json` and `CITATION.cff` in the tagged source are stale.
+
 ## Contributing
 
 Contributions are welcome! Please see individual action directories for specific documentation and examples.

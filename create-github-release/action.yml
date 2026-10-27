@@ -12,24 +12,64 @@ inputs:
     description: 'Directory containing source code'
     required: false
     default: 'src'
+  push_checkins:
+    description: >-
+      Whether to commit and push the updated Contents.m, codemeta.json and
+      CITATION.cff files. Set to 'false' when the branch is protected and no
+      check-in branch is used; the release is then tagged on the checked-out
+      commit, so the version strings in the tagged source are stale (the
+      packaged MLTBX still contains the updated files).
+    required: false
+    default: 'true'
+  checkin_branch:
+    description: >-
+      Branch to push the check-in commit to instead of the checked-out branch,
+      for example 'release/v{version}'. The action substitutes the release
+      version for the literal text {version}, so release/v{version} becomes
+      release/v1.2.3 when releasing 1.2.3. The branch is created if it does not
+      exist; open a pull request from it to bring the check-ins into a
+      protected default branch. The release tag then points at the check-in
+      commit, which joins the default branch's history only if that pull
+      request is merged with a merge commit. Leave empty to push to the
+      checked-out branch.
+    required: false
+    default: ''
 
 runs:
   using: "composite"
   steps:
     - name: Commit updated Contents.m, codemeta.json and CITATION.cff files
+      if: inputs.push_checkins == 'true'
       shell: bash
+      env:
+        VERSION_NUMBER: ${{ inputs.version_number }}
+        SOURCE_DIRECTORY: ${{ inputs.source_directory }}
+        CHECKIN_BRANCH: ${{ inputs.checkin_branch }}
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        find ${{ inputs.source_directory }} -type f -name Contents.m -exec git add {} +
+        find "$SOURCE_DIRECTORY" -type f -name Contents.m -exec git add {} +
         if [ -f codemeta.json ]; then git add codemeta.json; fi
         if [ -f CITATION.cff ]; then git add CITATION.cff; fi
         if git diff --cached --quiet; then
           echo "No Contents.m, codemeta.json or CITATION.cff changes to commit"
         else
-          git commit -m "Final check-ins for release v${{ inputs.version_number }} [skip actions]"
-          git fetch
-          git push
+          if [ -n "$CHECKIN_BRANCH" ]; then
+            # No [skip actions] here: GitHub would skip the checks of the
+            # pull request opened from this branch, so a protected default
+            # branch that requires status checks could not merge it.
+            git commit -m "Final check-ins for release v${VERSION_NUMBER}"
+            branch="${CHECKIN_BRANCH//\{version\}/$VERSION_NUMBER}"
+            echo "Pushing check-in commit to branch '$branch'"
+            if ! git push origin "HEAD:refs/heads/$branch"; then
+              echo "::error::Could not push the check-in commit to '$branch'. If '$branch' was left over from an earlier run of this release, delete it and re-run the release."
+              exit 1
+            fi
+          else
+            git commit -m "Final check-ins for release v${VERSION_NUMBER} [skip actions]"
+            git fetch
+            git push
+          fi
         fi
 
     - name: Update tag
