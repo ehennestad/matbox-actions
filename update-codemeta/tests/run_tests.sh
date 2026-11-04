@@ -29,7 +29,8 @@ setUpRepository() {
 }
 
 runScript() {
-    (cd "$workDirectory" && bash "$script" "1.2.3" "/runner/releases/ExampleToolbox_v1_2_3.mltbx" "tools")
+    local mltbxPath="${1:-/runner/releases/ExampleToolbox_v1_2_3.mltbx}"
+    (cd "$workDirectory" && bash "$script" "1.2.3" "$mltbxPath" "tools")
 }
 
 assertUpdated() {
@@ -47,6 +48,12 @@ setUpRepository "MLToolboxInfo.json"
 cp "${fixtures}/codemeta.json" "${workDirectory}/codemeta.json"
 runScript > /dev/null
 assertUpdated "$name" "codemeta_no_maximum.json"
+
+name="uses an unversioned MLTBX file name in downloadUrl"
+setUpRepository "MLToolboxInfo.json"
+cp "${fixtures}/codemeta.json" "${workDirectory}/codemeta.json"
+runScript "/runner/releases/ExampleToolbox.mltbx" > /dev/null
+assertUpdated "$name" "codemeta_unversioned_mltbx.json"
 
 name="writes a bounded runtimePlatform when a maximum release is set"
 setUpRepository "MLToolboxInfo_with_maximum.json"

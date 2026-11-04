@@ -98,3 +98,5 @@ The action uses the following priority order for toolbox packaging:
 2. **MatBox function**: Falls back to `matbox.tasks.packageToolbox` with the specified parameters including source folder configuration
 
 Both functions generate MLTBX files with the specified version number and toolbox metadata from MLToolboxInfo.json.
+
+`matbox.tasks.packageToolbox` names the file `<ToolboxName>_v<version>.mltbx`. When MLToolboxInfo.json has a top-level `MltbxFileName`, for example `"MltbxFileName": "MyToolbox"`, every release uses that file name instead, and the latest release can be downloaded from `https://github.com/<owner>/<repo>/releases/latest/download/MyToolbox.mltbx`. This requires a MatBox version that supports `MltbxFileName`; earlier versions ignore the field.
