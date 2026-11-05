@@ -1,0 +1,21 @@
+name: 'Check package readme'
+description: >-
+  Fail when the toolbox package built from MLToolboxInfo.json would have no
+  readme. From MATLAB R2026b an .mltbx file is a package file with a readme,
+  and File Exchange refuses a package file without one.
+
+inputs:
+  tools_directory:
+    description: 'Directory containing MLToolboxInfo.json'
+    required: false
+    default: 'tools'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check package readme
+      shell: bash
+      env:
+        TOOLS_DIRECTORY: ${{ inputs.tools_directory }}
+      run: |
+        bash "${{ github.action_path }}/check_package_readme.sh" "$TOOLS_DIRECTORY"

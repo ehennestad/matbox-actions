@@ -124,6 +124,7 @@ Do not pin to a commit SHA. The reusable workflows reference this repo's own act
 | [`configure-matlab-test-matrix`](./configure-matlab-test-matrix/) | Configure MATLAB version test matrices |
 | [`generate-tested-with-badge`](./generate-tested-with-badge/) | Generate "tested with" badges for MATLAB versions |
 | [`push-badges`](./push-badges/) | Push generated badges to repository |
+| [`check-package-readme`](./check-package-readme/) | Fail a release whose toolbox package would have no readme |
 | [`update-codemeta`](./update-codemeta/) | Update the release fields of a `codemeta.json` file |
 | [`update-citation`](./update-citation/) | Update the release fields of a `CITATION.cff` file |
 

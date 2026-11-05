@@ -56,6 +56,14 @@ jobs:
           fi
           echo "MLToolboxInfo.json found in ${{ inputs.tools_directory }} directory"
 
+      # The release packages with the latest MATLAB release, whose package
+      # file needs a readme. Checking here fails the release before any
+      # test job starts.
+      - name: Check that the package will have a readme
+        uses: ehennestad/matbox-actions/check-package-readme@main
+        with:
+          tools_directory: ${{ inputs.tools_directory }}
+
       - name: Build test matrix
         id: configure_test_matrix
         uses: ehennestad/matbox-actions/configure-matlab-test-matrix@main
