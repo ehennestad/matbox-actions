@@ -61,7 +61,7 @@ Validates version numbers.
 
 ### `create-matrix-job.yml`
 
-Creates test matrices for MATLAB and Python versions.
+Creates test matrices for MATLAB and Python versions. Before that, it fails when `MLToolboxInfo.json` is missing, or when the toolbox package would have no readme (see [`check-package-readme`](../../check-package-readme/)). The release workflows run this job before the tests, so both problems stop a release before any test job starts.
 
 **Inputs:**
 - `tools_directory` (default: 'tools'): Directory containing tools

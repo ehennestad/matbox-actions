@@ -1,0 +1,29 @@
+name: Test package readme check
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'check-package-readme/**'
+      - '.github/workflows/_internal-test-package-readme.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'check-package-readme/**'
+      - '.github/workflows/_internal-test-package-readme.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Run check-package-readme tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Run tests
+        run: bash check-package-readme/tests/run_tests.sh
