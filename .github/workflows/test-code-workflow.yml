@@ -43,6 +43,10 @@ on:
         description: Whether to generate the badge that reports test results (.github/badges/tests.svg). The code issues badge is not affected.
         type: boolean
         default: true
+      segmented_code_issues_badge:
+        description: Whether to draw the code issues badge with one segment per severity (errors, warnings, info). MatBox versions that write no issue counts keep the single badge.
+        type: boolean
+        default: false
     outputs:
       badges_stale:
         description: Whether generated badge files differ from committed badge files.
@@ -97,6 +101,7 @@ jobs:
           source_directory: ${{ inputs.source_directory }}
           tools_directory: ${{ inputs.tools_directory }}
           create_badge: ${{ env.SHOULD_CREATE_BADGES }}
+          segmented_code_issues_badge: ${{ inputs.segmented_code_issues_badge }}
       
       - name: Run tests
         uses: ehennestad/matbox-actions/test-code@main
